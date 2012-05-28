@@ -2235,7 +2235,25 @@ class BasicFunctions {
 	 			return true;
 	 			else
 	 				return false;
-	 }	
+	 }
+
+
+
+
+	/**
+	 * MB
+	 * check if element is empty
+	 */
+
+	public static function isEmpty() {
+		 
+		global $header_array, $global_e;
+		$e = $global_e;
+		if(trim($e->innertext)=='')
+			return true;
+		else
+			return false;
+	}	
 	
 	
 

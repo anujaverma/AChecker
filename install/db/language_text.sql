@@ -4617,3 +4617,144 @@ INSERT INTO `language_text` (`language_code`, `variable`, `term`, `text`, `revis
 ('eng', '_check', '_CNAME_426', 0x5465787420616c7465726e61746976657320617265206e6f742075706461746564207768656e206368616e67657320746f206e6f6e2d7465787420636f6e74656e74206f63637572, '2012-01-29 23:20:40', ''),
 ('eng', '_check', '_ERR_426', 0x5465787420616c7465726e617469766573206d6179206e6f742062652075706461746564207768656e206368616e67657320746f206e6f6e2d7465787420636f6e74656e74206f63637572, '2012-01-29 23:20:40', '');
 
+
+
+
+INSERT INTO `language_text` (`language_code`, `variable`, `term`, `text`, `revised_date`, `context`) VALUES
+('eng', '_check', '_ERR_427', 'Providing help information on every Web page', '2011-12-14 10:00:00', ''),
+('eng', '_check', '_ERR_428', 'Providing text instructions at the beginning of a form or set of fields that describes the necessary input', '2011-12-14 10:01:28', ''),
+('eng', '_check', '_CNAME_427', 'Providing help information on every Web page', '2011-12-14 10:00:00', ''),
+('eng', '_check', '_CNAME_428', 'Providing text instructions at the beginning of a form or set of fields that describes the necessary input', '2011-12-14 10:01:28', ''),
+('eng','_check', '_CNAME_429','Empty <code>h1</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_430','Empty <code>h2</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_431','Empty <code>h3</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_432','Empty <code>h4</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_433','Empty <code>h5</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_434','Empty <code>h6</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_435','Empty <code>abbr</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_436','Empty <code>acronym</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_437','Empty <code>address</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_438','Empty <code>b</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_439','Empty <code>bdo</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_440','Empty <code>big</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_441','Empty <code>blockquote</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_442','Empty <code>caption</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_443','Empty <code>center</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_444','Empty <code>cite</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_445','Empty <code>code</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_446','Empty <code>dd</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_447','Empty <code>del</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_448','Empty <code>dfn</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_449','Empty <code>dl</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_450','Empty <code>dt</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_451','Empty <code>em</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_452','Empty <code>font</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_453','Empty <code>i</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_454','Empty <code>ins</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_455','Empty <code>kbd</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_456','Empty <code>label</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_457','Empty <code>legend</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_458','Empty <code>li</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_459','Empty <code>noframes</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_460','Empty <code>noscript</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_461','Empty <code>option</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_462','Empty <code>p</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_463','Empty <code>param</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_464','Empty <code>pre</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_465','Empty <code>q</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_466','Empty <code>s</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_467','Empty <code>samp</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_468','Empty <code>small</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_469','Empty <code>span</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_470','Empty <code>strike</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_471','Empty <code>strong</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_472','Empty <code>sub</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_473','Empty <code>sup</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_474','Empty <code>td</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_475','Empty <code>th</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_476','Empty <code>title</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_477','Empty <code>tt</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_CNAME_478','Empty <code>u</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_429','Empty <code>h1</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_430','Empty <code>h2</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_431','Empty <code>h3</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_432','Empty <code>h4</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_433','Empty <code>h5</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_434','Empty <code>h6</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_435','Empty <code>abbr</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_436','Empty <code>acronym</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_437','Empty <code>address</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_438','Empty <code>b</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_439','Empty <code>bdo</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_440','Empty <code>big</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_441','Empty <code>blockquote<skip/code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_442','Empty <code>caption</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_443','Empty <code>center</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_444','Empty <code>cite</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_445','Empty <code>code</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_446','Empty <code>dd</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_447','Empty <code>del</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_448','Empty <code>dfn</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_449','Empty <code>dl</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_450','Empty <code>dt</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_451','Empty <code>em</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_452','Empty <code>font</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_453','Empty <code>i</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_454','Empty <code>ins</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_455','Empty <code>kbd</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_456','Empty <code>label</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_457','Empty <code>legend</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_458','Empty <code>li</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_459','Empty <code>noframes</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_460','Empty <code>noscript</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_461','Empty <code>option</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_462','Empty <code>p</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_463','Empty <code>param</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_464','Empty <code>pre</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_465','Empty <code>q</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_466','Empty <code>s</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_467','Empty <code>samp</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_468','Empty <code>small</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_469','Empty <code>span</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_470','Empty <code>strike</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_471','Empty <code>strong</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_472','Empty <code>sub</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_473','Empty <code>sup</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_474','Empty <code>td</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_475','Empty <code>th</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_477','Empty <code>tt</code> element.','2012-05-8 13:01:07',''),
+('eng','_check', '_ERR_478','Empty <code>u</code> element.','2012-05-8 13:01:07','');
+
+
+
+
+
+
+
+INSERT INTO `language_text` VALUES ('eng', '_check','_QUESTION_364','Does this link change its presentation when it receives keyboard focus?','2012-05-12 13:02:46','');
+INSERT INTO `language_text` VALUES ('eng', '_check','_DECISIONFAIL_364','Link doesn\'t change its presentation when it receives keyboard focus','2012-05-12 13:02:46','');
+INSERT INTO `language_text` VALUES ('eng', '_check','_DECISIONPASS_364','Link changes its presentation when it receives keyboard focus.','2012-05-12 13:02:39','');
+
+INSERT INTO `language_text` VALUES ('eng', '_check','_QUESTION_365','Does this text type input element change its presentation when it receives focus?','2012-05-12 13:02:46','');
+INSERT INTO `language_text` VALUES ('eng', '_check','_DECISIONFAIL_365','Text type input element doesn\'t change its presentation when it receives focus','2012-05-12 13:02:46','');
+INSERT INTO `language_text` VALUES ('eng', '_check','_DECISIONPASS_365','Text type input element changes its presentation when it receives focus','2012-05-12 13:02:39','');
+
+INSERT INTO `language_text` VALUES ('eng', '_check','_QUESTION_388','Does this select element change its presentation when it receives focus?','2012-05-12 13:02:46','');
+INSERT INTO `language_text` VALUES ('eng', '_check','_DECISIONFAIL_388','Select element doesn\'t change its presentation when it receives focus','2012-05-12 13:02:46','');
+INSERT INTO `language_text` VALUES ('eng', '_check','_DECISIONPASS_388','Select element changes its presentation when it receives focus','2012-05-12 13:02:39','');
+
+
+INSERT INTO `language_text` VALUES ('eng', '_check','_QUESTION_389','Does this textarea element change its presentation when it receives focus?','2012-05-12 13:02:46','');
+INSERT INTO `language_text` VALUES ('eng', '_check','_DECISIONFAIL_389','Textarea element doesn\'t change its presentation when it receives focus','2012-05-12 13:02:46','');
+INSERT INTO `language_text` VALUES ('eng', '_check','_DECISIONPASS_389','Textarea element changes its presentation when it receives focus','2012-05-12 13:02:39','');
+
+
+INSERT INTO `language_text` VALUES ('eng', '_check','_QUESTION_390','Does this button element change its presentation when it receives focus?','2012-05-12 13:02:46','');
+INSERT INTO `language_text` VALUES ('eng', '_check','_DECISIONFAIL_390','Button element doesn\'t change its presentation when it receives focus','2012-05-12 13:02:46','');
+INSERT INTO `language_text` VALUES ('eng', '_check','_DECISIONPASS_390','Button element changes its presentation when it receives focus','2012-05-12 13:02:39','');
+
+
+INSERT INTO `language_text` VALUES ('eng', '_check','_QUESTION_396','Does this link change its presentation when mouse pointer is moved over it?','2012-05-12 13:02:46','');
+INSERT INTO `language_text` VALUES ('eng', '_check','_DECISIONFAIL_396','Link doesn\'t change its presentation when mouse pointer is moved over it','2012-05-12 13:02:46','');
+INSERT INTO `language_text` VALUES ('eng', '_check','_DECISIONPASS_396','Link changes its presentation  when mouse pointer is moved over it','2012-05-12 13:02:39','');
+
