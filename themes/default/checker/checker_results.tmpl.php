@@ -37,11 +37,13 @@ if (is_array($this->seals))
 	<img class="inline-badge" src="<?php echo SEAL_ICON_FOLDER . $seal['seal_icon_name'];?>"
     alt="<?php echo $seal['title']; ?>" height="32" width="102"/>
     <pre class="badgeSnippet">
+	<code name="code" class="prettyprint">
   &lt;p&gt;
     &lt;a href="<?php echo AC_BASE_HREF; ?>checker/index.php?uri=referer&amp;gid=<?php echo $seal['guideline'].$user_link_url;?>"&gt;
       &lt;img src="<?php echo AC_BASE_HREF.SEAL_ICON_FOLDER . $seal['seal_icon_name'];?>" alt="<?php echo $seal['title']; ?>" height="32" width="102" /&gt;
     &lt;/a&gt;
   &lt;/p&gt;
+  </code>
 	</pre>
 
 <?php 
@@ -158,11 +160,14 @@ if (!$has_errors) {
 }
 ?>
 	</span>
+		
 <?php
 if ($has_errors) {
+
 	echo $this->a_rpt->getErrorRpt();
 }
 ?>
+
 	</div>
 
 <?php 
@@ -275,7 +280,10 @@ if (isset($this->aValidator) && $this->a_rpt->getAllowSetDecisions() == 'true')
 <h3><?php echo _AC('source');?></h3>
 <p><?php echo _AC('source_note');?></p>
 
+<code name="code" class="prettyprint">
 <?php echo $this->a_rpt->getSourceRpt();?>
+</code>
 </div>
 <?php }?>
 </div><br />
+

@@ -69,23 +69,42 @@ $lang_charset = "UTF-8";
 	<link rel="shortcut icon" href="<?php echo $this->base_path; ?>images/favicon.ico" type="image/x-icon" />
 	<link rel="stylesheet" href="<?php echo $this->base_path.'themes/'.$this->theme; ?>/forms.css" type="text/css" />
 	<link rel="stylesheet" href="<?php echo $this->base_path.'themes/'.$this->theme; ?>/styles.css" type="text/css" />
+	<link rel="stylesheet" href="<?php echo $this->base_path.'themes/'.$this->theme; ?>/prettify.css" type="text/css" />
+	<!--<link rel="stylesheet" href="<?php echo $this->base_path.'themes/'.$this->theme; ?>/desert.css" type="text/css" />-->
 	<!--[if IE]>
 	  <link rel="stylesheet" href="<?php echo $this->base_path.'themes/'.$this->theme; ?>/ie_styles.css" type="text/css" />
 	<![endif]-->
 	<script src="<?php echo $this->base_path; ?>jscripts/lib/jquery.js" type="text/javascript"></script>
+		<script src="<?php echo $this->base_path; ?>jscripts/lib/prettify.js" type="text/javascript"></script>
 	<script src="<?php echo $this->base_path; ?>jscripts/lib/jquery-URLEncode.js" type="text/javascript"></script>
 	<script src="<?php echo $this->base_path; ?>jscripts/AChecker.js" type="text/javascript"></script>   
 	<?php echo $this->rtl_css; ?>
 	<?php echo $this->custom_head; ?>
+	<script language="JavaScript" src="jscripts/sha-1factory.js" type="text/javascript"></script>
+	<script type="text/javascript">
+/* 
+
+ * Encrypt login password with sha1
+ */
+function encrypt_password() {
+
+	document.form.form_password_hidden.value = hex_sha1(hex_sha1(document.form.form_password.value) + "<?php echo $_SESSION['token']; ?>");
+	alert("asd");
+	document.form.form_password.value = "";
+
+	return true;
+}
+</script>
 </head>
 
-<body onload="<?php echo $this->onload; ?>">
+<body onload="prettyPrint()" onload="<?php echo $this->onload; ?>">
 
 <?php if (isset($this->show_jump_to_report)){ ?>
 <a href="checker/index.php#output_div"><img src="images/clr.gif" height="1" width="1" alt="<?php echo _AC("jump_to_report"); ?>" border="0" /></a>
 <?php } ?>
-<div id="liquid-round"><div class="top"><span></span></div>
+<div id="liquid-round"><!--<div class="top"><span></span></div>-->
 <div class="center-content" id="center-content">
+		<div id="top_bg">
 		<div id="logo">
 			<a href="http://www.atutor.ca/achecker/"><img src="<?php echo $this->base_path.'themes/'.$this->theme; ?>/images/checker_logo.png"  alt="AChecker" style="border:none;" /></a>
 		</div>
@@ -104,9 +123,34 @@ $lang_charset = "UTF-8";
         else
         {
         ?>
-				<a href="<?php echo AC_BASE_HREF; ?>login.php" ><?php echo _AC('login'); ?></a>
-				&nbsp;&nbsp;
-				<a href="<?php echo AC_BASE_HREF; ?>register.php" ><?php echo _AC('register'); ?></a>
+			
+<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" name="form">
+<input type="hidden" name="form_login_action" value="true" />
+<input type="hidden" name="form_course_id" value="<?php echo $this->course_id; ?>" />
+<input type="hidden" name="form_password_hidden" value="" />
+<table width="300" height="130">
+  <tr>
+    <td width="50%"><div class="required" title="<?php echo _AC('required_field'); ?>">*</div><label for="login"><?php echo _AC('login_name_or_email'); ?></label> </td>
+    <td><input type="text" name="form_login"  id="login"  class="formfield" /><br /></td>
+  </tr>
+  <tr>
+    <td><div class="required" align="right" title="<?php echo _AC('required_field'); ?>">*</div><label for="pass"><?php echo _AC('password'); ?></label></td>
+    <td><input type="password" class="formfield" name="form_password" id="pass"/></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center">
+<p class="submit_button">
+						<input type="submit" name="submit" value="<?php echo _AC('login'); ?>" class="submit" onclick="return encrypt_password();" /> 
+					</p>
+</td>
+    
+  </tr>
+   <tr>
+    <td><a href="password_reminder.php">Forgot Password?</a></td>
+	<td> <a href="register.php">Register new Account</a></td>
+  </tr>
+</table>
+</form>
         <?php
         }
         ?>
@@ -114,17 +158,19 @@ $lang_charset = "UTF-8";
 		
 	</div>
 
-	<div class="topnavlistcontainer">
+	<div class="header_links">
 	<!-- the main navigation. in our case, tabs -->
-		<ul class="navigation">
+		<table cellspacing="5">
+		<tr>
 			<?php foreach ($this->top_level_pages as $page): ?>
 				<?php if ($page['url'] == $this->current_top_level_page): ?>
-					<li class="navigation"><a href="<?php echo $page['url']; ?>" title="<?php echo $page['title']; ?>" class="active"><span class="nav"><?php echo $page['title']; ?></span></a></li>
+					<td><!--<span class="upper_link"> --><a href="<?php echo $page['url']; ?>" title="<?php echo $page['title']; ?>" class="active"><!--<span class="nav">--><?php echo $page['title']; ?><!--</span>--></a><!--</span>--></td>
 				<?php else: ?>
-					<li class="navigation"><a href="<?php echo $page['url']; ?>"  title="<?php echo $page['title']; ?>"><span class="nav"><?php echo $page['title']; ?></span></a></li>
+					<td><a href="<?php echo $page['url']; ?>"  title="<?php echo $page['title']; ?>"><!--<span class="nav">--><?php echo $page['title']; ?><!--</span>--></a></td>
 				<?php endif; ?>
 			<?php endforeach; ?>
-		</ul>
+		</tr>
+		</table>
 	</div>
 
 	<!-- the sub navigation and guide -->
@@ -159,7 +205,7 @@ $lang_charset = "UTF-8";
 		<?php endif; ?>
 		</div>
 	</div>
-
+</div>
 
 <a name="content" title="<?php echo _AC("content_start"); ?>"></a>
 <?php global $msg; $msg->printAll();?>

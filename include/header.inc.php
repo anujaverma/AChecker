@@ -11,7 +11,52 @@
 /************************************************************************/
 // $Id$
 
-if (!defined('AC_INCLUDE_PATH')) { exit; }
+if (!defined('AC_INCLUDE_PATH')) { define('AC_INCLUDE_PATH', 'include/'); }
+require_once(AC_INCLUDE_PATH.'vitals.inc.php');
+
+require_once(AC_INCLUDE_PATH. 'classes/DAO/UsersDAO.class.php');
+require_once(AC_INCLUDE_PATH. 'classes/Message/Message.class.php');
+
+$usersDAO = new UsersDAO();
+$msg = new Message(1);
+
+// $_SESSION['token'] is used to encrypt the password from web form
+if (!isset($_SESSION['token']))
+	$_SESSION['token'] = sha1(mt_rand() . microtime(TRUE));
+
+if (isset($_POST['submit']))
+{
+	
+	$user_id = $usersDAO->Validate(($_POST['form_login']), ($_POST['form_password_hidden']));
+		    //   print "In BaseClass constructor\n";
+	if (!$user_id)
+	{
+		$msg->addError('INVALID_LOGIN');
+	}
+	else
+	{
+		if ($usersDAO->getStatus($user_id) == AC_STATUS_DISABLED) {
+			$msg->addError('ACCOUNT_DISABLED');
+		} else if ($usersDAO->getStatus($user_id) == AC_STATUS_UNCONFIRMED) {
+			$msg->addError('ACCOUNT_UNCONFIRMED');
+		}
+		else {
+			$usersDAO->setLastLogin($user_id);
+			$_SESSION['user_id'] = $user_id;
+			$msg->addFeedback('LOGIN_SUCCESS');
+			header('Location: index.php');
+			exit;
+		}
+	}
+	
+}
+
+global $onload;
+$onload = 'document.form.form_login.focus();';
+
+//header('P3P: CP="IDC DSP COR CURa ADMa OUR IND PHY ONL COM STA"');
+
+
 
 global $myLang;
 global $savant;

@@ -48,8 +48,9 @@ $fail_examples = $checkExamplesDAO->getByCheckIDAndType($check_id, AC_CHECK_EXAM
 $guidelineGroupsDAO = new GuidelineGroupsDAO();
 $guidelineSubgroupsDAO = new GuidelineSubgroupsDAO();
 ?>
+
 <div class="output-form">
-	
+
 <h2><?php echo _AC("html_tag"); ?></h2>
 <span class="msg"><?php echo $row["html_tag"]; ?></span>
 
@@ -139,7 +140,7 @@ if ($row["repair_example"] <> "")
 ?>
 
 <h2><?php echo _AC("repair_example"); ?></h2>
-<pre class="code"><?php echo htmlentities(_AC($row["repair_example"])); ?></pre>
+<pre class="code"><code name="code" class="prettyprint"><?php echo htmlentities(_AC($row["repair_example"])); ?></code></pre>
 
 <?php
 }
@@ -205,7 +206,7 @@ if ($row["test_failed_result"] <> "")
 <h3><?php echo _AC("pass_examples"); ?></h3>
 <?php 		foreach ($pass_examples as $pass_example) {?>
 <span class="msg"><?php echo $pass_example['description']; ?></span>
-<pre class="code"><?php echo htmlentities($pass_example['content']); ?></pre>
+<pre class="code"><code name="code" class="prettyprint"><?php echo htmlentities($pass_example['content']); ?></code></pre>
 <?php 		} // end of foreach?>
 <?php 	} // end of if (pass examples)?>
 
@@ -213,12 +214,14 @@ if ($row["test_failed_result"] <> "")
 <h3><?php echo _AC("fail_examples"); ?></h3>
 <?php 		foreach ($fail_examples as $fail_example) {?>
 <span class="msg"><?php echo $fail_example['description']; ?></span>
-<pre class="code"><?php echo htmlentities($fail_example['content']); ?></pre>
+<pre class="code"><code name="code" class="prettyprint">	<?php echo htmlentities($fail_example['content']); ?></code></pre>
 <?php 		} // end of foreach?>
 <?php 	} // end of if (pass examples)?>
 
 <?php }?>
+
 </div>
+
 <?php
 // display footer
 include(AC_INCLUDE_PATH.'footer.inc.php');

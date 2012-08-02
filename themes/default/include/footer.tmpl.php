@@ -18,7 +18,6 @@ global $languageManager, $_my_uri;
 if($languageManager->getNumEnabledLanguages() > 1)
 {
 ?>
-
 <div align="center" id="lang" style="clear: both;"><br />
 <?php
 
@@ -33,7 +32,8 @@ if($languageManager->getNumEnabledLanguages() > 1)
 		$languageManager->printList($_SESSION['lang'], 'lang', 'lang', htmlspecialchars($_my_uri));
 	}
 ?>
-</div><br /><br />
+</div>
+<br /><br />
 <?php } ?>
 
 
@@ -42,8 +42,6 @@ if($languageManager->getNumEnabledLanguages() > 1)
 	<small><?php echo _AC("acheck_copyright"); ?></small><br />
 	
 </div>
-
-
 </div> <!--  end center-content div -->
 <div class="bottom"><span></span></div><!--  bottom for liquid-round theme -->
 </div> <!-- end liquid-round div -->
@@ -77,7 +75,7 @@ function rowselectbox(obj, checked, handler) {
 </html>
 
 <?php
-// Timer, calculate how much time to load the page
+/*// Timer, calculate how much time to load the page
 // starttime is in include/header.inc.php
 global $starttime;
 $mtime = microtime(); 
@@ -93,6 +91,6 @@ if (defined('AC_DEVEL') && AC_DEVEL)
 	debug($totaltime. ' seconds.', "TIME USED"); 
 	debug($_SESSION);
 }
-// Timer Ends
+// Timer Ends*/
 
 ?>
