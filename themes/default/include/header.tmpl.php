@@ -89,7 +89,7 @@ $lang_charset = "UTF-8";
 function encrypt_password() {
 
 	document.form.form_password_hidden.value = hex_sha1(hex_sha1(document.form.form_password.value) + "<?php echo $_SESSION['token']; ?>");
-	alert("asd");
+	
 	document.form.form_password.value = "";
 
 	return true;
