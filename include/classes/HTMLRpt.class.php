@@ -32,12 +32,23 @@ class HTMLRpt extends AccessibilityRpt {
 	var $num_of_likely_problems_fail;        // Number of likely errors that decisions have not been made
 	var $num_of_potential_problems_fail;     // Number of potential errors that decisions have not been made
 	
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	var $num_of_likely_no_decisions;         // Number of likely errors that decisions have not been made
+	var $num_of_potential_no_decisions;	 // Number of potential errors that decisions have not been made
+	var $num_of_affirmed_problems;
+	var $num_of_checked_warnings;
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+	
 	var $rpt_likely_decision_made;           // The output report of the likely problems which are the ones that decisions have been made on 
 	var $rpt_potential_decision_made;        // The output report of the likely problems which are the ones that decisions have been made on
 	
 	var $rpt_likely_decision_not_made;       // The output report of the likely problems which are the ones that no decisions have been made on
 	var $rpt_potential_decision_not_made;    // The output report of the likely problems which are the ones that no decisions have been made on
 	
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	var $rpt_affirmed_decisions;
+	var $rpt_checked_decisions;
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 	var $html_problem_achecker =
 '      <li class="{MSG_TYPE}">
          <span class="err_type"><img src="{BASE_HREF}images/{IMG_SRC}" alt="{IMG_TYPE}" title="{IMG_TYPE}" width="15" height="15" /></span>
@@ -139,6 +150,13 @@ class HTMLRpt extends AccessibilityRpt {
 		// run parent constructor
 		parent::AccessibilityRpt($errors, $user_link_id);
 		
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		$this->num_of_likely_no_decisions = 0;
+		$this->num_of_potential_no_decisions = 0;
+		$this->num_of_affirmed_problems = 0;
+		$this->num_of_checked_warnings = 0;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+		
 		$this->num_of_no_decisions = 0;
 		$this->num_of_made_decisions = 0;
 		
@@ -165,6 +183,11 @@ class HTMLRpt extends AccessibilityRpt {
 		$this->rpt_errors = "<ul>\n";
 		$this->rpt_likely_problems = "<ul>\n";
 		$this->rpt_potential_problems = "<ul>\n";
+		
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		$this->rpt_affirmed_problems = "<ul>\n";
+		$this->rpt_checked_warnings = "<ul>\n";
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		
 		$checksDAO = new ChecksDAO();
 		// generate section details
@@ -208,13 +231,24 @@ class HTMLRpt extends AccessibilityRpt {
 		if ($this->allow_set_decision == 'true' || 
 		    ($this->allow_set_decision == 'false' && $this->from_referer == 'true' && $this->user_link_id > 0))
 		{
-			$this->rpt_likely_problems .= $this->rpt_likely_decision_not_made.$this->rpt_likely_decision_made;
-			$this->rpt_potential_problems .= $this->rpt_potential_decision_not_made.$this->rpt_potential_decision_made;
+			//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
+			$this->rpt_likely_problems .= $this->rpt_likely_decision_not_made;
+			$this->rpt_potential_problems .= $this->rpt_potential_decision_not_made;
+			//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
+			
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+			$this->rpt_affirmed_problems .= $this->rpt_affirmed_decisions;
+			$this->rpt_checked_warnings .= $this->rpt_checked_decisions;
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		}
 		
 		$this->rpt_errors .= "</ul>";
 		$this->rpt_likely_problems .= "</ul>";
 		$this->rpt_potential_problems .= "</ul>";
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		$this->rpt_affirmed_problems .= "</ul>";
+		$this->rpt_checked_warnings .= "</ul>";
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		
 		if ($this->show_source == 'true')
 		{
@@ -275,9 +309,18 @@ class HTMLRpt extends AccessibilityRpt {
 			}                                
 			// generate problem section
 			$problem_section = $this->generate_problem_section($check_row['check_id'], $line_number, $col_number, $html_code, $image, $image_alt, $css_code, _AC($check_row['err']), _AC($check_row['how_to_repair']), $decision_section, $error_type);
-			if ($error_type == IS_WARNING) $this->rpt_likely_decision_not_made .= $problem_section;
-			if ($error_type == IS_INFO) $this->rpt_potential_decision_not_made .= $problem_section;
-			
+			if ($error_type == IS_WARNING) {
+				$this->rpt_likely_decision_not_made .= $problem_section;
+				//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+				$this->num_of_likely_no_decisions++;
+				//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+			}
+			if ($error_type == IS_INFO) { 
+				$this->rpt_potential_decision_not_made .= $problem_section;
+				//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+				$this->num_of_potential_no_decisions++;
+				//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+			}
 			$this->num_of_no_decisions++;
 		}
 		else
@@ -322,6 +365,15 @@ class HTMLRpt extends AccessibilityRpt {
 			if ($error_type == IS_WARNING) $this->rpt_likely_decision_made .= $problem_section;
 			if ($error_type == IS_INFO) $this->rpt_potential_decision_made .= $problem_section;
 			
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+			if ($row['decision'] == AC_DECISION_PASS){
+				$this->rpt_checked_decisions .= $problem_section;
+				$this->num_of_checked_warnings++;
+			}else{
+				$this->rpt_affirmed_decisions .= $problem_section;
+				$this->num_of_affirmed_problems++;
+			}
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 			$this->num_of_made_decisions++;
 		}
 	}
@@ -446,6 +498,45 @@ class HTMLRpt extends AccessibilityRpt {
 		
 		$this->rpt_source = str_replace("{SOURCE_CONTENT}", $source_content, $this->html_source);
 	}
+	
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	/**
+	* public 
+	* return number of likely errors that decision have not been made
+	*/
+	public function getNumOfLikelyNoDecisions()
+	{
+		return $this->num_of_likely_no_decisions;
+	}
+	
+	/**
+	* public 
+	* return number of potential errors that decision have not been made
+	*/
+	public function getNumOfPotentialNoDecisions()
+	{
+		return $this->num_of_potential_no_decisions;
+	}
+	
+	/**
+	* public 
+	* return number of checked warnings that decision have not been made
+	*/
+	public function getNumOfCheckedWarnings()
+	{
+		return $this->num_of_checked_warnings;
+	}
+	
+	/**
+	* public 
+	* return number of checked warnings that decision have not been made
+	*/
+	public function getNumOfAffirmedProblems()
+	{
+		return $this->num_of_affirmed_problems;
+	}
+	
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 	
 	/**
 	* public 

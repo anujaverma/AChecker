@@ -25,7 +25,13 @@ if ($_POST["rpt_format"] == REPORT_FORMAT_GUIDELINE) {
 	$rpt_format = "by_guideline";
 } else if ($_POST["rpt_format"] == REPORT_FORMAT_LINE) {
 	$rpt_format = "by_line";
+}//Added by Anirudh Subramanian for Achecker Manual Evaluations Begin
+else if ($_POST["rpt_format"] == REPORT_FORMAT_HTML_TAG){
+	$rpt_format = "by_errortype";
 }
+
+
+//Added by Anirudh Subramanian for Achecker Manual Evaluations End
 
 $onload="AChecker.input.initialize('".$init_tab."', '".$rpt_format."');";
 $_custom_head .= '	<script language="javascript" type="text/javascript">'."\n".
@@ -241,6 +247,9 @@ echo get_guideline_div($this->rows, $this->num_of_guidelines_per_row, "checkbox"
 			<tr>
 				<td class="one_third_width"><input type="radio" name="rpt_format" value="<?php echo REPORT_FORMAT_GUIDELINE; ?>" id="option_rpt_gdl" <?php if ($_POST["rpt_format"] == REPORT_FORMAT_GUIDELINE) echo 'checked="checked"'; ?> /><label for="option_rpt_gdl"><?php echo _AC("view_by_guideline"); ?></label></td>
 				<td class="one_third_width"><input type="radio" name="rpt_format" value="<?php echo REPORT_FORMAT_LINE; ?>" id="option_rpt_line" <?php if ($_POST["rpt_format"] == REPORT_FORMAT_LINE) echo 'checked="checked"'; ?> /><label for="option_rpt_line"><?php echo _AC("view_by_line"); ?></label></td>
+				<!--Added by Anirudh Subramanian for AChecker Manual Evaluations Begin-->
+				<td class="one_third_width"><input type="radio" name="rpt_format" value="<?php echo REPORT_FORMAT_HTML_TAG; ?>" id="option_rpt_errtyp" <?php if ($_POST["rpt_format"] == REPORT_FORMAT_HTML_TAG) echo 'checked="checked"'; ?> /><label for="option_rpt_errtyp"><?php echo _AC("view_by_error"); ?></label></td>                  
+				<!--Added by Anirudh Subramanian for AChecker Manual Evaluations End-->
 			</tr>
 		</table>
 		</div>

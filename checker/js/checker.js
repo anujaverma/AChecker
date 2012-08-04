@@ -51,7 +51,15 @@ AChecker.output = AChecker.output || {};
         },
         "AC_css_validation_result": {
             menuID: "AC_menu_css_validation_result"
-        }
+        },
+        /*Added by Anirudh Subramanian for AChecker Manual Evaluations Begin*/
+	"AC_affirmed_problems": {
+            menuID: "AC_menu_affirmed_problems"
+        },
+	"AC_checked_warnings": {
+	    menuID: "AC_menu_checked_warnings"
+	}  
+	/*Added by Anirudh Subramanian for AChecker Manual Evaluations End*/
     };
 
     AChecker.output.makeDecisionButtonId = "AC_btn_make_decision_lineNumRpt";
@@ -98,13 +106,18 @@ AChecker.output = AChecker.output || {};
         // link click event on radio buttons on "options" => "report format"
         $("#option_rpt_gdl").click(clickOptionRptGDL);
         $("#option_rpt_line").click(clickOptionRptLine);
-        
+        //Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	$("#option_rpt_errtyp").click(clickOptionRptLine);
+	//Added by Anirudh Subramanian for Achecker Manual Evaluations End
+	
         // initialized the "options" => "guidelines" section, based on the selected "report format"
         if (rptFormat === "by_guideline") {
             $("#option_rpt_gdl").trigger("click");
         } else if (rptFormat === "by_line") {
             $("#option_rpt_line").trigger("click");
-        }
+        } else if (rptFormat == "by_errortype") { // Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	    $("#option_rpt_errtyp").trigger("click");
+	}// Added by Anirudh Subramanian for AChecker Manual Evaluations End
     };
     
     /**
@@ -256,11 +269,17 @@ AChecker.output = AChecker.output || {};
             var flag = true;
             $(this_child).parents('table:eq(0)').find('.AC_childCheckBox').each(
                 function () {
-                    if (!this.checked) {
-                        flag = false;
-                    }
+		    //Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		    if($(this).is(':hidden') === false){
+		    //Added by Anirudh Subramanian for AChecker Manual Evaluations End  
+			if (!this.checked) {
+			  flag = false;
+			}
+		    //Added by Anirudh Subramanian for AChecker Manual Evaluations Begin	
+		    }
+		    //Added by Anirudh Subramanian for AChecker Manual Evaluations End
                 }
-            );
+            );	
             $(this_child).parents('table:eq(0)').find('.AC_selectAllCheckBox').attr('checked', flag);
             $(this_child).parent().parent().addClass('selected');
         } else {
@@ -300,13 +319,20 @@ AChecker.output = AChecker.output || {};
         $(btn_make_decision).parents('table:eq(0)').find('.AC_childCheckBox').each(function () {
             // find out the id of message icon
             var checkboxName = $(this).attr('name');
+	    //Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	    var checkboxID = $(this).attr('id');
+	    //Added by Anirudh Subramanian for AChecker Manual Evaluations End
             var msgIconID = checkboxName.replace('d[', '');
             msgIconID = msgIconID.replace(']', '');
             
             var msgIconIDValue = '#msg_icon_' + msgIconID;
-
-            var msgIcon = $(msgIconIDValue);
-            if (this.checked) {
+	    
+            
+            //Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
+            var msgIcon = $(this).parents('tr:eq(0)').find(msgIconIDValue);
+	    //Modified by Anirudh Subramanian for AChecker Manual Evaluations End
+	    
+	    if (this.checked) {
                 msgIcon.attr('src', 'images/feedback.gif');
                 msgIcon.attr('title', AChecker.lang.pass_decision);
                 msgIcon.attr('alt', AChecker.lang.pass_decision);
@@ -334,24 +360,120 @@ AChecker.output = AChecker.output || {};
      * Modify the number of problems on the tab bar. 
      * Called by makeDecisions()
      */
-    var changeNumOfProblems = function () {
+    var changeNumOfProblems = function (noOfRedundantChecks,presentTab) {
         var divsToLookup = ["AC_likely_problems", "AC_potential_problems"];
         var divIDsToUpdateErrorNum = ["AC_num_of_likely", "AC_num_of_potential"];
         var arrayNumOfProblems = new Array(2);
-
         // decide the tab to work on and number of problems
         for (var i in divsToLookup) {
-            var currentDiv = $('div[id="' + divsToLookup[i] + '"]');
-            // find number of all problems (checkboxes) in the current tab
-            var total = $(currentDiv).find("input[class=AC_childCheckBox]").length;
-            var checked = $(currentDiv).find("input[class=AC_childCheckBox]:checked").length;
-            
-            var numOfProblems = total - checked;
-            $("#" + divIDsToUpdateErrorNum[i]).html(numOfProblems);
-            
-            arrayNumOfProblems[i] = numOfProblems;
-        }
-        
+	    if(presentTab === divsToLookup[i]){
+		
+		var currentDiv = $('div[id="' + divsToLookup[i] + '"]');
+		// find number of all problems (checkboxes) in the current tab
+		var total = $(currentDiv).find("input[class=AC_childCheckBox]").length;
+		var checked = $(currentDiv).find("input[class=AC_childCheckBox]:checked").length;
+		var hidden = $(currentDiv).find("input[class=AC_childCheckBox]:hidden").length;
+		
+		var numOfProblems = total - hidden;
+		
+		
+		//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		if(divsToLookup[i] === 'AC_likely_problems'){
+		    arrayNumOfProblems[i] = numOfProblems + noOfRedundantChecks[0];
+		}else{
+		    arrayNumOfProblems[i] = numOfProblems + noOfRedundantChecks[1];
+		}
+		$("#" + divIDsToUpdateErrorNum[i]).html(arrayNumOfProblems[i]);
+		//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
+	    }else{
+		arrayNumOfProblems[i] = 1;
+	    }      
+	}
+        return arrayNumOfProblems;
+    };
+    
+    
+    /**
+     * private
+     * Modify the number of problems on the tab bar. 
+     * Called by makeDecisions()
+     */
+    var changeNumOfProblemsLikelyPotential = function (btn_make_decision) {
+        var divsToLookup = ["AC_likely_problems", "AC_potential_problems"];
+        var divIDsToUpdateErrorNum = ["AC_num_of_likely", "AC_num_of_potential"];
+        var arrayNumOfProblems = new Array(2);
+	// decide the tab to work on and number of problems
+        for (var i in divsToLookup) {
+		if($(btn_make_decision).parents('.gd_one_check').parent().attr('id') === divsToLookup[i]){
+		    var currentDiv = $('div[id="' + divsToLookup[i] + '"]');
+		    var toBeHidden = $(btn_make_decision).parents('table:eq(0)').find('.AC_childCheckBox').length;
+		    var alreadyHidden = $(btn_make_decision).parents('table:eq(0)').find("input[class=AC_childCheckBox]:hidden").length;
+		    var checked = $(btn_make_decision).parents('table:eq(0)').find("input[class=AC_childCheckBox]:checked").length;
+		    var hidden = toBeHidden - alreadyHidden;
+		    var currentNumber = $("#" + divIDsToUpdateErrorNum[i]).html();
+		    var numOfProblems = currentNumber - hidden;
+		    arrayNumOfProblems[i] = numOfProblems;
+		    
+		    $("#" + divIDsToUpdateErrorNum[i]).html(arrayNumOfProblems[i]);
+		    
+		    var errorsAffirmed = hidden - checked;
+		    var errorsChecked = checked;
+		    var currentNumberAffirmed = $("#AC_num_of_affirmed").html();
+		    var currentNumberChecked = $("#AC_num_of_checked").html();
+		    
+		    currentNumberChecked = parseInt(currentNumberChecked);
+		    currentNumberAffirmed = parseInt(currentNumberAffirmed);
+		    
+		    $("#AC_num_of_affirmed").html(currentNumberAffirmed + errorsAffirmed);
+		    $("#AC_num_of_checked").html(currentNumberChecked + errorsChecked);
+		}else{
+		    arrayNumOfProblems[i] = $("#" + divIDsToUpdateErrorNum[i]).html();
+		}
+      
+	}
+        return arrayNumOfProblems;
+    };
+    
+    /**
+     * private
+     * Modify the number of problems on the tab bar. 
+     * Called by makeDecisions()
+     */
+    var changeNumOfProblemsCheckedAffirmed = function (btn_make_decision,problem_type) {
+        var divsToLookup = ["AC_affirmed_problems", "AC_checked_warnings"];
+        var divIDsToUpdateErrorNum = ["AC_num_of_affirmed", "AC_num_of_checked"];
+        var arrayNumOfProblems = new Array(2);
+	arrayNumOfProblems[0] = parseInt($("AC_num_of_likely").html());
+	arrayNumOfProblems[1] = parseInt($("AC_num_of_potential").html())
+	// decide the tab to work on and number of problems
+        for (var i in divsToLookup) {
+		if($(btn_make_decision).parents('.gd_one_check').parent().attr('id') === divsToLookup[i]){
+		    var currentDiv = $('div[id="' + divsToLookup[i] + '"]');
+		    var toBeHidden = $(btn_make_decision).parents('table:eq(0)').find('.AC_childCheckBox').length;
+		    var checked = $(btn_make_decision).parents('table:eq(0)').find("input[class=AC_childCheckBox]:checked").length;
+		    var currentNumber = $("#" + divIDsToUpdateErrorNum[i]).html();
+		    currentNumber = parseInt(currentNumber);
+		    var numOfProblems = currentNumber - checked;
+		    $(btn_make_decision).parents('table:eq(0)').find("input[class=AC_childCheckBox]").attr('checked',false);
+		    $("#" + divIDsToUpdateErrorNum[i]).html(numOfProblems);
+		    if(problem_type === 'AC_likely_problems'){
+			var currentNumberLikely = $("#AC_num_of_likely").html();
+			currentNumberLikely = parseInt(currentNumberLikely);
+			
+			var numOfProblemsLikely = currentNumberLikely + checked;		      
+			$("#AC_num_of_likely").html(numOfProblemsLikely);			
+			arrayNumOfProblems[0] = numOfProblemsLikely;
+		    }else{
+			var currentNumberPotential = $("#AC_num_of_potential").html();
+			currentNumberPotential = parseInt(currentNumberPotential);
+			
+			var numOfProblemsPotential = currentNumberPotential + checked;
+			$("#AC_num_of_potential").html(numOfProblemsPotential);
+			
+			arrayNumOfProblems[1] = numOfProblemsPotential;
+		    }
+		}
+	}
         return arrayNumOfProblems;
     };
     
@@ -379,31 +501,182 @@ AChecker.output = AChecker.output || {};
             }
         });
     };
+    /**
+     * Method to count no of errors under a check
+     * Called by reverseDecision()
+     * Added by Anirudh Subramanian for AChecker Manual Evaluations
+     */
+    var countHiddenErrorSiblings = function (checkboxToBeHidden) {
+	var noOfSiblingErrorsVisible = 0;
+	checkboxToBeHidden.parents('table:eq(0)').find('.AC_childCheckBox').each( function() {
+		if($(this).parents('tr:eq(0)').is(':hidden') === false){
+			
+			noOfSiblingErrorsVisible++;
+		}
+	});
+	return noOfSiblingErrorsVisible;
+    };
     
     /**
-     * Click event on "make decision" buttons. It does:
-     * 1. ajax post to save into db
-     * 2. prompt success or error msg returned from server besides the "make decision" button
-     * 3. flip warning/info icons besides problems with pass decisons made to green pass icons
-     * 4. change the number of problems on the tab bar
-     * 5. when the number of problems is reduced to 0, 
-     *    ajax request the seal html from server and display it in seal container
+     * Method to count no of checks visible under a subgroup
+     * Called by makeDecision()
+     * Added by Anirudh Subramanian for AChecker Manual Evaluations
+    */
+    var countHiddenSubGroupChecks = function (group_check) {
+	var noOfSiblingChecksVisible = 0;
+	$(group_check).siblings('.gd_one_check').each(function(){
+		if($("input[id=option_rpt_gdl]").attr('checked')){
+			if($(this).prevAll('h4').first().text() === $(group_check).prevAll('h4').first().text()){
+				if($(this).is(':hidden') === false){
+					noOfSiblingChecksVisible++;
+				}					
+			}
+		}else{
+			if($(this).prevAll('h3').first().text() === $(group_check).prevAll('h3').first().text()){
+				if($(this).is(':hidden') === false){
+					noOfSiblingChecksVisible++;
+				}					
+			}
+		}  
+	});
+	return noOfSiblingChecksVisible;
+    };
+    
+    /**
+     * Method to count no of subgroups visible under a group
+     * Called by makeDecision()
+     * Added by Anirudh Subramanian for AChecker Manual Evaluations 
+     */ 
+    var countHiddenSubGroups = function (group_check) {
+      var noOfSiblingSubGroupsVisible = 0;
+      $(group_check).siblings('.gd_one_check').each(function(){
+		if($(this).prevAll('h3').first().text() === $(group_check).prevAll('h3').first().text()){
+			if($(this).prevAll('h4').first().is(':hidden') === false){
+				noOfSiblingSubGroupsVisible++;
+			}
+		}
+      });
+      return noOfSiblingSubGroupsVisible;
+    };
+    //Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+    /**
+     * shows error groups in appropriate tabs when the user does manual evaluation 
      */
-    var makeDecision = function (btn_make_decision) {
-        var ajaxPostStr = "";
+    
+    var showErrorGroup = function (child_checkbox) {
+	$(child_checkbox).parents('tr:eq(0)').removeClass('selected');
+	$(child_checkbox).attr('checked',false);
+	$(child_checkbox).parents('tr:eq(0)').show();
+	$(child_checkbox).parents('.gd_one_check').find('.AC_selectAllCheckBox').attr('checked', false); 
+	$(child_checkbox).parents('.gd_one_check').show();
+	$(child_checkbox).parents('tr:eq(0)').parents('.gd_one_check').prevAll('h3').first().show();
+	if($("input[id=option_rpt_gdl]").attr('checked')) {
+		$(child_checkbox).parents('tr:eq(0)').parents('.gd_one_check').prevAll('h4').first().show();	  
+	}      
+    }
+    
+    
+    
+    
+    
+    
+    //Added by Anirudh Subramanian for AChecker Manual Evaluations End
+    
+    /**
+     * Click event on "reverse decision" buttons. It does:
+     * 1.hides the decision from affirmed problems /checked warnings section
+     * 2.renders it in the likely problems / potential problems section
+     * Added by Anirudh Subramanian for AChecker Manual Evaluations
+     */
+    
+    
+    var reverseDecision = function (btn_make_decision) {
+	var ajaxPostStr = "";
+	var noOfSiblingChecksSubgroupVisible = 0;
+	var noOfSiblingSubGroupsVisible = 0;
+	var selectAllBoxId = $(btn_make_decision).parents('table:eq(0)').find('.AC_selectAllCheckBox').attr('id');
+	var isInsideLikelyProblems = false;
+	var isInsidePotentialProblems = false;
+	var arrayNumOfProblems = new Array(2);
+	$(btn_make_decision).parents('table:eq(0)').parents('.gd_one_check').parent().find('.AC_selectAllCheckBox').each( function() {
+	    if($(this).attr('id') === selectAllBoxId) {
+		$(this).parents('table:eq(0)').find('.AC_childCheckBox').each(function () {    
+			if (this.checked) {
+			    ajaxPostStr += $(this).attr('name') + "=" + "N" + "&";
+			    var checkboxToBeHidden = $(this);
+			    var childCheckBoxIdShow = $(this).attr('name');
 
-        $('input[class="AC_childCheckBox"]').each(function () {
-            if (this.checked) {
-                ajaxPostStr += $(this).attr('name') + "=" + "P" + "&";
-            } else {
-                ajaxPostStr += $(this).attr('name') + "=" + "N" + "&";
-            }
-        });
+			    if($("input[id=option_rpt_gdl]").attr('checked')){
+				$(this).parents('tr:eq(0)').hide();
+				//$(this).attr('checked',false);
+				noOfSiblingErrorsVisible = countHiddenErrorSiblings(checkboxToBeHidden);
+				
+				if(noOfSiblingErrorsVisible === 0){
 
-        ajaxPostStr += "uri" + "=" + $.URLEncode($('input[name="uri"]').attr('value')) + "&" + 
+					$(this).parents('.gd_one_check').hide();
+					noOfSiblingChecksSubgroupVisible = countHiddenSubGroupChecks($(this).parents('.gd_one_check'));				
+					if(noOfSiblingChecksSubgroupVisible === 0){
+						$(this).parents('.gd_one_check').prevAll('h4').first().hide();
+						noOfSiblingSubGroupsVisible = countHiddenSubGroups($(this).parents('.gd_one_check'));
+						if(noOfSiblingSubGroupsVisible === 0){
+							$(this).parents('.gd_one_check').prevAll('h3').first().hide();					
+						}
+					}				  
+				}
+					  
+				
+				$(this).parents('.gd_one_check').parent().siblings('#AC_likely_problems').find('.AC_childCheckBox').each(function (){
+					if($(this).attr('name') === childCheckBoxIdShow){
+						isInsideLikelyProblems = true;
+						showErrorGroup(this);						
+					}
+				});
+				$(this).parents('.gd_one_check').parent().siblings('#AC_potential_problems').find('.AC_childCheckBox').each(function (){
+					if($(this).attr('name') === childCheckBoxIdShow){
+						isInsidePotentialProblems = true;
+						showErrorGroup(this);
+					}
+				});
+			    }else{
+			      
+				$(this).parents('tr:eq(0)').hide();  
+				noOfSiblingErrorsVisible = countHiddenErrorSiblings(checkboxToBeHidden);
+				if(noOfSiblingErrorsVisible === 0){
+
+					$(this).parents('.gd_one_check').hide();
+					noOfSiblingChecksSubgroupVisible = countHiddenSubGroupChecks($(this).parents('.gd_one_check'));				
+					if(noOfSiblingChecksSubgroupVisible === 0){
+						$(this).parents('.gd_one_check').prevAll('h3').first().hide();				  
+					}				  
+			    
+				    
+				}      
+				$(this).parents('.gd_one_check').parent().siblings('#AC_likely_problems').find('.AC_childCheckBox').each(function (){
+					if($(this).attr('name') === childCheckBoxIdShow){
+						isInsideLikelyProblems = true;
+						showErrorGroup(this);
+					}
+				});
+				$(this).parents('.gd_one_check').parent().siblings('#AC_potential_problems').find('.AC_childCheckBox').each(function (){
+					if($(this).attr('name') === childCheckBoxIdShow){
+						
+						isInsidePotentialProblems = true;
+						showErrorGroup(this);
+					}
+				});
+			    }  
+		    
+			}
+			});    
+			  
+		}
+	});
+	
+	
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	ajaxPostStr += "uri" + "=" + $.URLEncode($('input[name="uri"]').attr('value')) + "&" + 
             "output" + "=" + $('input[name="output"]').attr('value') + "&" +
             "jsessionid" + "=" + $('input[name="jsessionid"]').attr('value');
-    
         $.ajax({
             type: "POST",
             url: "checker/save_decisions.php",
@@ -415,9 +688,194 @@ AChecker.output = AChecker.output || {};
                 
                 // flip icon to green pass icon
                 flipMsgIcon(btn_make_decision);
+            
                 
-                // modify and store the number of problems on the tab bar
-                var arrayNumOfProblems = changeNumOfProblems();
+		//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
+		// modify and store the number of problems on the tab bar
+		if(isInsideLikelyProblems){
+			arrayNumOfProblems = changeNumOfProblemsCheckedAffirmed(btn_make_decision, 'AC_likely_problems');
+		}else{
+			arrayNumOfProblems = changeNumOfProblemsCheckedAffirmed(btn_make_decision, 'AC_potential_problems' );
+		}
+                // No more likely problems, display congrats message on "likely problems" tab
+                if (arrayNumOfProblems[0] === 0) {
+                    $("#AC_congrats_msg_for_likely").html(AChecker.lang.congrats_likely);
+                    $("#AC_congrats_msg_for_likely").addClass("congrats_msg");
+                } else {
+                    $("#AC_congrats_msg_for_likely").html("");
+                    $("#AC_congrats_msg_for_likely").removeClass("congrats_msg");
+                }
+                
+                // No more potential problems, display congrats message on "potential problems" tab
+                if (arrayNumOfProblems[1] === 0) {
+                    $("#AC_congrats_msg_for_potential").html(AChecker.lang.congrats_potential);
+                    $("#AC_congrats_msg_for_potential").addClass("congrats_msg");
+                } else {
+                    $("#AC_congrats_msg_for_potential").html("");
+                    $("#AC_congrats_msg_for_potential").removeClass("congrats_msg");
+                }
+                
+                // if all errors, likely, potential problems are 0, retrieve seal
+                if (arrayNumOfProblems[0] === 0 && arrayNumOfProblems[1] === 0) {
+                    // find the number of errors
+                    var numOfErrors = $('#AC_num_of_errors').text();
+
+                    if (numOfErrors === 0) {
+                        showSeal(btn_make_decision);
+                    }
+                } else {
+                    $('#' + AChecker.output.sealDivID).html("");
+                }
+            }, 
+            
+            error: function (xhr, errorType, exception) {
+                // display error message
+                displayErrorMsg(btn_make_decision, $(xhr.responseText).text());
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		
+		var selectAllCheckBoxId = $(btn_make_decision).parents('tr:eq(0)').parents('table:eq(0)').find('.AC_selectAllCheckBox').attr('id');
+		$(btn_make_decision).parents('.gd_one_check').siblings().find('input[id^="AC_btn_make_decision"]').each( function(){	
+			var currSelectAllCheckBoxId = $(this).parents('table:eq(0)').find('.AC_selectAllCheckBox').attr('id');
+			if(selectAllCheckBoxId === currSelectAllCheckBoxId){
+				displayErrorMsg(this, $(xhr.responseText).text());
+			}
+		});
+		
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+            }
+	});    
+            //Added by Anirudh Subramanian for AChecker Manual Evaluations End
+    };
+    /**
+     * Click event on "make decision" buttons. It does:
+     * 1. ajax post to save into db
+     * 2. prompt success or error msg returned from server besides the "make decision" button
+     * 3. flip warning/info icons besides problems with pass decisons made to green pass icons
+     * 4. change the number of problems on the tab bar
+     * 5. when the number of problems is reduced to 0, 
+     *    ajax request the seal html from server and display it in seal container
+     */
+    var makeDecision = function (btn_make_decision) {
+        var ajaxPostStr = "";
+	var makeDecisionCheckboxID = $(btn_make_decision).parents('table:eq(0)').find('.AC_childCheckBox').attr('id');
+	var noOfSiblingChecksSubgroupVisible = 0;
+	var noOfSiblingSubGroupsVisible = 0;
+	var selectAllBoxId = $(btn_make_decision).parents('table:eq(0)').find('.AC_selectAllCheckBox').attr('id');
+	// modify and store the number of problems on the tab bar
+	var arrayNumOfProblems = changeNumOfProblemsLikelyPotential(btn_make_decision);
+	$(btn_make_decision).parents('table:eq(0)').parents('.gd_one_check').parent().find('.AC_selectAllCheckBox').each( function() {
+	    if($(this).attr('id') === selectAllBoxId) {
+		$(this).parents('table:eq(0)').find('.AC_childCheckBox').each(function () {
+		    if (this.checked) { 
+			ajaxPostStr += $(this).attr('name') + "=" + "P" + "&";
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+			var checkboxToBeHidden = $(this);
+			var childCheckBoxIdShow = $(this).attr('name');
+			
+			if($("input[id=option_rpt_gdl]").attr('checked')){
+						$(this).parents('tr:eq(0)').hide();
+						$(this).attr('checked',false);
+						$(this).parents('.gd_one_check').hide();
+						noOfSiblingChecksSubgroupVisible = countHiddenSubGroupChecks($(this).parents('.gd_one_check'));				
+						if(noOfSiblingChecksSubgroupVisible === 0){
+							$(this).parents('.gd_one_check').prevAll('h4').first().hide();
+							noOfSiblingSubGroupsVisible = countHiddenSubGroups($(this).parents('.gd_one_check'));
+							
+							if(noOfSiblingSubGroupsVisible === 0) {
+								$(this).parents('.gd_one_check').prevAll('h3').first().hide();					
+							}				  
+						}
+				$(this).parents('.gd_one_check').parent().siblings('#AC_checked_warnings').find('.AC_childCheckBox').each(function () {
+					if($(this).attr('name') === childCheckBoxIdShow){
+						showErrorGroup(this);
+					}
+				});
+			}else{
+				$(this).parents('tr:eq(0)').hide();
+				$(this).attr('checked',false);
+				$(this).parents('.gd_one_check').hide();
+				noOfSiblingChecksSubgroupVisible = countHiddenSubGroupChecks($(this).parents('.gd_one_check'));				
+				if(noOfSiblingChecksSubgroupVisible === 0){
+					$(this).parents('.gd_one_check').prevAll('h3').first().hide();				  
+				}
+				$(this).parents('.gd_one_check').parent().siblings('#AC_checked_warnings').find('.AC_childCheckBox').each(function (){
+					if($(this).attr('name') === childCheckBoxIdShow){
+						showErrorGroup(this);
+						
+					}
+				});
+			}
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+		    }else{
+			if($("input[id=option_rpt_gdl]").attr('checked')) {
+				$(this).parents('tr:eq(0)').hide();
+				$(this).attr('checked',false);
+				var checkboxToBeHidden = $(this);
+				var childCheckBoxIdShow = $(this).attr('id');
+				noOfSiblingChecksSubgroupVisible = 0;
+				noOfSiblingSubGroupsVisible = 0;
+				//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+				$(this).parents('.gd_one_check').parent().find('.gd_one_check').each(function() {
+					if($(this).find('.gd_msg').text() === checkboxToBeHidden.parents('tr:eq(0)').parents('.gd_one_check').find('.gd_msg').text()) {
+						$(this).hide();
+						noOfSiblingChecksSubgroupVisible = countHiddenSubGroupChecks(this);				
+						if(noOfSiblingChecksSubgroupVisible === 0) {
+							$(this).prevAll('h4').first().hide();
+							noOfSiblingSubGroupsVisible = countHiddenSubGroups(this);
+							if(noOfSiblingSubGroupsVisible === 0){
+								$(this).prevAll('h3').first().hide();					
+							}				  
+						}
+					}	
+				});
+				$(this).parents('.gd_one_check').parent().siblings('#AC_affirmed_problems').find('.AC_childCheckBox').each(function () {
+					if($(this).attr('id') === childCheckBoxIdShow){
+						showErrorGroup(this);
+					}
+				});
+				//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+				ajaxPostStr += $(this).attr('name') + "=" + "F" + "&";
+			}else{
+				var checkboxToBeHidden = $(this);
+				var childCheckBoxIdShow = $(this).attr('name');
+				noOfSiblingChecksSubgroupVisible = 0;
+				//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+				$(this).parents('tr:eq(0)').hide();
+				$(this).attr('checked',false);
+				$(this).parents('.gd_one_check').hide();
+				noOfSiblingChecksSubgroupVisible = countHiddenSubGroupChecks($(this).parents('.gd_one_check'));				
+				if(noOfSiblingChecksSubgroupVisible === 0) {
+					$(this).parents('.gd_one_check').prevAll('h3').first().hide();				  
+				}
+				$(this).parents('.gd_one_check').parent().siblings('#AC_affirmed_problems').find('.AC_childCheckBox').each(function () {
+					if($(this).attr('name') === childCheckBoxIdShow) {
+						showErrorGroup(this);					  
+					}
+				});
+				//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+				ajaxPostStr += $(this).attr('name') + "=" + "F" + "&";
+			}
+		    }
+		});
+		
+	    }
+	});
+
+        ajaxPostStr += "uri" + "=" + $.URLEncode($('input[name="uri"]').attr('value')) + "&" + 
+            "output" + "=" + $('input[name="output"]').attr('value') + "&" +
+            "jsessionid" + "=" + $('input[name="jsessionid"]').attr('value');
+        $.ajax({
+            type: "POST",
+            url: "checker/save_decisions.php",
+            data: ajaxPostStr,
+
+            success: function (data) {
+                // display success message
+                displaySuccessMsg(btn_make_decision, data);
+                
+                // flip icon to green pass icon
+                flipMsgIcon(btn_make_decision);
+		
                 
                 // No more likely problems, display congrats message on "likely problems" tab
                 if (arrayNumOfProblems[0] === 0) {
@@ -453,43 +911,123 @@ AChecker.output = AChecker.output || {};
             error: function (xhr, errorType, exception) {
                 // display error message
                 displayErrorMsg(btn_make_decision, $(xhr.responseText).text());
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		var selectAllCheckBoxId = $(btn_make_decision).parents('tr:eq(0)').parents('table:eq(0)').find('.AC_selectAllCheckBox').attr('id');
+		$(btn_make_decision).parents('.gd_one_check').siblings().find('input[id^="AC_btn_make_decision"]').each( function(){	
+			var currSelectAllCheckBoxId = $(this).parents('table:eq(0)').find('.AC_selectAllCheckBox').attr('id');
+			if(selectAllCheckBoxId === currSelectAllCheckBoxId){
+				displayErrorMsg(this, $(xhr.responseText).text());
+			}
+		});		
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
             }
         });
     };
 
     $(document).ready(
         function () {
-            //clicking the "select all" checkbox should check or uncheck all child checkboxes
+	    
+            //clicking the "select all" checkbox should check or uncheck all child checkboxes	    
+	    //Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
             $(".AC_selectAllCheckBox").click(function () {
+		var selectAllCheckId = $(this).attr('id');
                 var table = $(this).parents('table:eq(0)');
-                $(table).find('.AC_childCheckBox').attr('checked', this.checked);
-                if (this.checked) {
+                //$(table).find('.AC_childCheckBox').attr('checked', this.checked);
+                $(table).find('.AC_childCheckBox').each(function(){
+			if($(this).is(':hidden') === false){
+				$(this).attr('checked', this.checked);			  
+			}
+			
+		});
+		if (this.checked) {
                     $(table).find('tr').addClass("selected");
                 } else {
                     $(table).find('tr').removeClass("selected");
                 }
+                //Changed temporarily
+                var checkState = this.checked;
+		//Changed temporarily
+                $(this).parents('.gd_one_check').parent().find(".AC_selectAllCheckBox").each(function() {
+			if ($(this).attr('id') === selectAllCheckId) {
+				table = $(this).parents('table:eq(0)');
+				$(this).attr('checked',checkState);
+				//Modified temporarily
+				//$(table).find('.AC_childCheckBox').attr('checked', checkState);
+				$(table).find('.AC_childCheckBox').each(function(){
+					if($(this).is(':hidden') === false){
+						$(this).attr('checked', checkState);			  
+					}
+				});
+				//Modified temporarily
+				if (this.checked) {
+					$(table).find('tr').addClass("selected");
+				} else {
+					$(table).find('tr').removeClass("selected");
+				}
+			}
+		});
             });
-        
-            //clicking the last unchecked or checked checkbox should check or uncheck the parent "select all" checkbox
-            $('.AC_childCheckBox').click(function () {
-                undoSelectAll(this);
-            });
-        
-            //clicking the last unchecked or checked checkbox should check or uncheck the parent "select all" checkbox
-            $('.AC_problem_detail').click(function () {
-                $(this).siblings().find('.AC_childCheckBox').each(
-                    function () {
-                        $(this).attr('checked', !this.checked);
-                        undoSelectAll(this);
-                    }
+	    //Modified by Anirudh Subramanian for AChecker Manual Evaluations End
+	    
+            //clicking the last unchecked or checked checkbox should check or uncheck the parent "select all" checkbox        
+	    //Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	    $(".AC_childCheckBox").click(function() {
+		var childCheckBoxId = $(this).attr('id');
+		var childCheckBoxIsChecked = $(this).attr('checked');
+		var selectAllCheckBoxId = $(this).parents('table:eq(0)').find('.AC_selectAllCheckBox').attr('id');
+		$(this).parents('table:eq(0)').parents('.gd_one_check').parent().find('.AC_selectAllCheckBox').each( function() {
+			if ( selectAllCheckBoxId === $(this).attr('id')) {
+				$(this).parents('table:eq(0)').find('.AC_childCheckBox').each( function() {
+					if( $(this).attr('id') === childCheckBoxId ) {
+						$(this).attr('checked',childCheckBoxIsChecked);
+						undoSelectAll(this);
+					}
+				});
+			}
+		});
+		
+	    });
+	    
+	    $(".AC_problem_detail").click(function() {
+		var childCheckBoxId = "";
+		var childCheckBoxIsChecked = "";
+		$(this).siblings().find('.AC_childCheckBox').each(
+			function () {
+				childCheckBoxId = $(this).attr('id');
+				$(this).attr('checked', !this.checked);
+				childCheckBoxIsChecked = $(this).attr('checked');
+				undoSelectAll(this);
+			}
                 );
-            });
-        
+		var selectAllCheckBoxId = $(this).parents('table:eq(0)').find('.AC_selectAllCheckBox').attr('id');
+		$(this).parents('table:eq(0)').parents('.gd_one_check').parent().find('.AC_selectAllCheckBox').each( function() {			
+			if ( selectAllCheckBoxId === $(this).attr('id') ) {
+				$(this).parents('table:eq(0)').find('.AC_childCheckBox').each( function() {
+					if( $(this).attr('id') === childCheckBoxId ) {
+						if($(this).attr('checked') != childCheckBoxIsChecked) {
+							$(this).attr('checked',childCheckBoxIsChecked);
+						}
+						undoSelectAll(this);
+					}
+				});
+			}
+		});
+		
+	    });	    
+	    //Modified by Anirudh Subramanian for AChecker Manual Evaluations End
+	    
             // clicking on "make decision" button
             $('input[id^="AC_btn_make_decision"]').click(function () {
-                makeDecision(this);
+		 makeDecision(this);
             });
-        
+
+	    //Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	    
+	    $('input[id^="AC_btn_reverse_decision"]').click(function () {
+		 reverseDecision(this);
+            });
+	    
+	    //Added by Anirudh Subramanian for AChecker Manual Evaluations End
         }
     );
 })(jQuery);

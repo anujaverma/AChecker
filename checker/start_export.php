@@ -144,50 +144,65 @@ if (preg_match("/<title>(.+)<\/title>/siU", $validate_content, $matches)) $title
 $known = array();
 $likely = array();
 $potential = array();
+//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+$affirmed = array();
+$checked = array();
+//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 $error_nr_known = 0;
 $error_nr_likely = 0;
 $error_nr_potential = 0;
-
+//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+$error_nr_affirmed = 0;
+$error_nr_checked = 0;
+//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 // create file depending on user choice
 if ($file == 'pdf') {	
 	if ($problem != 'html' && $problem != 'css') {
 		if ($mode == 'guideline') $a_rpt = new FileExportRptGuideline($errors, $_gids[0], $user_link_id);
 		else if ($mode == 'line') $a_rpt = new FileExportRptLine($errors, $user_link_id);
-	
-		list($known, $likely, $potential) = $a_rpt->generateRpt();
-		list($error_nr_known, $error_nr_likely, $error_nr_potential) = $a_rpt->getErrorNr();
+		//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		list($known, $likely, $potential, $affirmed, $checked) = $a_rpt->generateRpt();
+		list($error_nr_known, $error_nr_likely, $error_nr_potential, $error_nr_affirmed, $error_nr_checked) = $a_rpt->getErrorNr();
+		//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
 	}
 	include_once(AC_INCLUDE_PATH. 'classes/exportRpt/exportTFPDF.class.php');
-	
-	$pdf = new acheckerTFPDF($known, $likely, $potential, $html, $css, 
-		$error_nr_known, $error_nr_likely, $error_nr_potential, $error_nr_html, $error_nr_css, $css_error, $html_error);
+	//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin	
+	$pdf = new acheckerTFPDF($known, $likely, $potential, $affirmed, $checked, $html, $css, 
+		$error_nr_known, $error_nr_likely, $error_nr_potential, $error_nr_affirmed, $error_nr_checked, $error_nr_html, $error_nr_css, $css_error, $html_error);
+	//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
+	//debug_to_log("Start export");
 	$path = $pdf->getPDF($title, $uri, $problem, $mode, $_gids);
 			
-} else {	
+} else {
 	if ($problem != 'html' && $problem != 'css') {
 		$a_rpt = new FileExportRptLine($errors, $user_link_id);
-		list($known, $likely, $potential) = $a_rpt->generateRpt();
-		list($error_nr_known, $error_nr_likely, $error_nr_potential) = $a_rpt->getErrorNr();
+		list($known, $likely, $potential, $affirmed, $checked) = $a_rpt->generateRpt();
+		list($error_nr_known, $error_nr_likely, $error_nr_potential, $error_nr_affirmed, $error_nr_checked) = $a_rpt->getErrorNr();
 	}
 	
 	if ($file == 'earl') {
 		include_once(AC_INCLUDE_PATH. 'classes/exportRpt/exportEARL.class.php');
-		
-		$earl = new acheckerEARL($known, $likely, $potential, $html, $css, 
-			$error_nr_known, $error_nr_likely, $error_nr_potential, $error_nr_html, $error_nr_css, $css_error, $html_error);
+		//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		$earl = new acheckerEARL($known, $likely, $potential, $affirmed, $checked, $html, $css, 
+			$error_nr_known, $error_nr_likely, $error_nr_potential, $error_nr_affirmed, $error_nr_checked, $error_nr_html, $error_nr_css, $css_error, $html_error);
+		//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
 		$path = $earl->getEARL($problem, $input_content_type, $title, $_gids);
 		
 	} else if ($file == 'csv') {	
 		include_once(AC_INCLUDE_PATH. 'classes/exportRpt/exportCSV.class.php');		
 		
-		$csv = new acheckerCSV($known, $likely, $potential, $html, $css, 
-			$error_nr_known, $error_nr_likely, $error_nr_potential, $error_nr_html, $error_nr_css, $css_error, $html_error);
+		//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		$csv = new acheckerCSV($known, $likely, $potential, $affirmed, $checked, $html, $css, 
+			$error_nr_known, $error_nr_likely, $error_nr_potential, $error_nr_affirmed, $error_nr_checked, $error_nr_html, $error_nr_css, $css_error, $html_error);
+		//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
 		$path = $csv->getCSV($problem, $input_content_type, $title, $_gids);
 		
 	} else if ($file == 'html') {	
-		include_once(AC_INCLUDE_PATH. 'classes/exportRpt/exportHTML.class.php');		
-		$html_file = new acheckerHTML($known, $likely, $potential, $html, $css, 
-			$error_nr_known, $error_nr_likely, $error_nr_potential, $error_nr_html, $error_nr_css, $css_error, $html_error);
+		include_once(AC_INCLUDE_PATH. 'classes/exportRpt/exportHTML.class.php');
+		//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		$html_file = new acheckerHTML($known, $likely, $potential, $affirmed, $checked, $html, $css, 
+			$error_nr_known, $error_nr_likely, $error_nr_potential, $error_nr_affirmed, $error_nr_checked, $error_nr_html, $error_nr_css, $css_error, $html_error);
+		//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
 		$path = $html_file->getHTMLfile($problem, $_gids, $errors, $user_link_id);
 
 	}

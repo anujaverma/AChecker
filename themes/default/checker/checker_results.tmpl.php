@@ -37,13 +37,11 @@ if (is_array($this->seals))
 	<img class="inline-badge" src="<?php echo SEAL_ICON_FOLDER . $seal['seal_icon_name'];?>"
     alt="<?php echo $seal['title']; ?>" height="32" width="102"/>
     <pre class="badgeSnippet">
-	<code name="code" class="prettyprint">
   &lt;p&gt;
     &lt;a href="<?php echo AC_BASE_HREF; ?>checker/index.php?uri=referer&amp;gid=<?php echo $seal['guideline'].$user_link_url;?>"&gt;
       &lt;img src="<?php echo AC_BASE_HREF.SEAL_ICON_FOLDER . $seal['seal_icon_name'];?>" alt="<?php echo $seal['title']; ?>" height="32" width="102" /&gt;
     &lt;/a&gt;
   &lt;/p&gt;
-  </code>
 	</pre>
 
 <?php 
@@ -117,6 +115,16 @@ if (isset($this->aValidator) && $this->a_rpt->getAllowSetDecisions() == 'true')
 					<option value="potential"><?php echo _AC('potential'); ?></option>
 					<option value="html"><?php echo _AC('html_validation_result'); ?></option>
 					<option value="css"><?php echo _AC('css_validation_result'); ?></option>
+					<!--Added by Anirudh Subramanian for AChecker for Manual Evaluations Begin -->
+					<?php
+						if(isset($_SESSION['user_id'])) {				
+					?>
+					<option value="affirmed"><?php echo _AC('affirmed'); ?></option>
+					<option value="checked"><?php echo _AC('checked'); ?></option>
+					<?php
+						}
+					?>
+					<!--Added by Anirudh Subramanian for AChecker for Manual Evaluations End-->
 				</select>&nbsp;&nbsp;&nbsp;&nbsp;
 
 				<iframe id="downloadFrame" src="" style="display:none;"></iframe>
@@ -142,6 +150,17 @@ if (isset($this->aValidator) && $this->a_rpt->getAllowSetDecisions() == 'true')
 			<li class="navigation"><a href="javascript:void(0);" accesskey="4" title="<?php echo _AC("html_validation_result"); ?> Alt+4" id="AC_menu_html_validation_result" onclick="AChecker.output.onClickTab('AC_html_validation_result');"><span class="nav"><?php echo _AC("html_validation_result"); ?> <?php if (isset($_POST["enable_html_validation"])) echo '(<span id="AC_num_of_html_errors">'.$this->num_of_html_errors."</span>)"; ?></span></a></li>
 
 			<li class="navigation"><a href="javascript:void(0);" accesskey="5" title="<?php echo _AC("css_validation_result"); ?> Alt+5" id="AC_menu_css_validation_result" onclick="AChecker.output.onClickTab('AC_css_validation_result');"><span class="nav"><?php echo _AC("css_validation_result"); ?> <?php if (isset($this->cssValidator)) echo '(<span id="AC_num_of_css_errors">'.$this->num_of_css_errors."</span>)"; ?></span></a></li>
+			<!--Added by Anirudh Subramanian for AChecker Manual Evaluations Begin -->
+			<?php
+				if(isset($_SESSION['user_id'])) {				
+			?>
+			<li class="navigation"><a href="javascript:void(0);" accesskey="6" title="<?php echo _AC("affirmed_problems"); ?> Alt+6" id="AC_menu_affirmed_problems" onclick="AChecker.output.onClickTab('AC_affirmed_problems');"><span class="nav"><?php echo _AC("affirmed_problems"); ?>(<span id="AC_num_of_affirmed"><?php echo $this->num_of_affirmed_problems; ?></span>)</span></a></li>
+			<li class="navigation"><a href="javascript:void(0);" accesskey="7" title="<?php echo _AC("checked_warnings"); ?> Alt+7" id="AC_menu_checked_warnings" onclick="AChecker.output.onClickTab('AC_checked_warnings');"><span class="nav"><?php echo _AC("checked_warnings"); ?>(<span id="AC_num_of_checked"><?php echo $this->num_of_checked_warnings; ?></span>)</span></a></li>
+			<?php
+				}
+			?>
+			<!--Added by Anirudh Subramanian for AChecker Manual Evaluations End -->
+			
 		</ul>
 	</div>
 
@@ -160,14 +179,11 @@ if (!$has_errors) {
 }
 ?>
 	</span>
-		
 <?php
 if ($has_errors) {
-
 	echo $this->a_rpt->getErrorRpt();
 }
 ?>
-
 	</div>
 
 <?php 
@@ -261,6 +277,31 @@ if (isset($_POST['validate_file']) || isset($_POST['validate_paste'])) {
 }
 ?>
 	</div>
+<!--Added by Anirudh Subramanian for AChecker Manual Evaluations Begin -->
+
+	<div id="AC_affirmed_problems" style="margin-top:1em; display:none;">
+	<br />
+<?php
+
+	if (isset($this->aValidator) ) {
+		echo $this->a_rpt->getAffirmedProblemRpt();
+	}
+
+?>	
+	</div>
+
+
+	<div id="AC_checked_warnings" style="margin-top:1em; display:none;">
+	</br>
+<?php
+
+	if (isset($this->aValidator) ) {
+		echo $this->a_rpt->getCheckedWarningRpt();
+	}
+
+?>		
+	</div>
+<!--Added by Anirudh Subramanian for AChecker Manual Evaluations End -->	
 	</fieldset>
 
 <?php 
@@ -274,7 +315,6 @@ if (isset($this->aValidator) && $this->a_rpt->getAllowSetDecisions() == 'true')
 }
 ?>
 </div>
-
 <?php if (isset($_POST['show_source']) && isset($this->aValidator)) {?>
 <div id="source" class="validator-output-form">
 <h3><?php echo _AC('source');?></h3>
@@ -282,8 +322,6 @@ if (isset($this->aValidator) && $this->a_rpt->getAllowSetDecisions() == 'true')
 
 <code name="code" class="prettyprint">
 <?php echo $this->a_rpt->getSourceRpt();?>
-</code>
 </div>
 <?php }?>
 </div><br />
-

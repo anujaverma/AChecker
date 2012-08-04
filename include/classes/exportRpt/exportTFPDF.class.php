@@ -31,6 +31,10 @@ class acheckerTFPDF extends tFPDF {
 	var $known = array();
 	var $likely = array();
 	var $potential = array();
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	var $affirmed = array();
+	var $checked = array();
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 	var $html = array();
 	var $css = array();
 	
@@ -38,6 +42,10 @@ class acheckerTFPDF extends tFPDF {
 	var $error_nr_known = 0;
 	var $error_nr_likely = 0;
 	var $error_nr_potential = 0;
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	var $error_nr_affirmed = 0;
+	var $error_nr_checked = 0;
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 	var $error_nr_html = 0;
 	var $error_nr_css = 0;
 	
@@ -57,8 +65,8 @@ class acheckerTFPDF extends tFPDF {
 	* $error_nr_html, $error_nr_css: nr of errors
 	* $css_error: empty if css validation was required with URL input, otherwise string with error msg
 	*/
-	function acheckerTFPDF($known, $likely, $potential, $html, $css, 
-		$error_nr_known, $error_nr_likely, $error_nr_potential, $error_nr_html, $error_nr_css, $css_error, $html_error)
+	function acheckerTFPDF($known, $likely, $potential, $affirmed, $checked, $html, $css, 
+		$error_nr_known, $error_nr_likely, $error_nr_potential, $error_nr_affirmed, $error_nr_checked, $error_nr_html, $error_nr_css, $css_error, $html_error)
 	{
 		//Call parent constructor
 		$this->tFPDF('P','mm','A4');
@@ -66,12 +74,20 @@ class acheckerTFPDF extends tFPDF {
 		$this->known = $known;
 		$this->likely = $likely;
 		$this->potential = $potential;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		$this->affirmed = $affirmed;
+		$this->checked = $checked;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		$this->html = $html;
 		$this->css = $css;
 		
 		$this->error_nr_known = $error_nr_known;
 		$this->error_nr_likely = $error_nr_likely;
 		$this->error_nr_potential = $error_nr_potential;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		$this->error_nr_affirmed = $error_nr_affirmed;
+		$this->error_nr_checked = $error_nr_checked;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		$this->error_nr_html = $error_nr_html;
 		$this->error_nr_css = $error_nr_css;
 		
@@ -184,8 +200,15 @@ class acheckerTFPDF extends tFPDF {
 		} else if ($problem_type == 'potential') {
 			$array = $this->potential;
 			$nr = $this->error_nr_potential;
-		}
-		
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		} else if ($problem_type == 'affirmed') {
+			$array = $this->affirmed;
+			$nr = $this->error_nr_affirmed;
+		} else if ($problem_type == 'checked') {
+			$array = $this->checked;
+			$nr = $this->error_nr_checked;
+		}		
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		if ($nr == '') $nr = 0;		
 	
 		// str with error type and nr of errors
@@ -241,7 +264,6 @@ class acheckerTFPDF extends tFPDF {
 							$this->Write(5, $check_group['repair']['label'].": ".strip_tags($check_group['repair']['detail']));
 							$this->Ln(8);
 						}
-						
 						// one error output
 						foreach($check_group['errors'] as $error) {
 							// error icon img, line, column, error text
@@ -280,7 +302,6 @@ class acheckerTFPDF extends tFPDF {
 									$this->Ln(3);
 								}							
 							}	
-							
 							// if user is logged in display labels 'passed', 'failed' or 'no decision'
 							if ((isset($_SESSION['user_id'])) && ($problem_type != 'known')) {
 								$this->SetFont('DejaVu', 'B', 10);
@@ -288,7 +309,7 @@ class acheckerTFPDF extends tFPDF {
 								if ($error['test_passed'] == 'true') {
 									$this->SetTextColor(134, 218, 130);
 									$this->Write(5, strtoupper(_AC('file_passed')));
-								} else if ($error['test_passed'] == false) {
+								} else if ($error['test_passed'] == 'false') {
 									$this->SetTextColor(246, 114, 114);
 									$this->Write(5, strtoupper(_AC('file_failed')));
 								} else if ($error['test_passed'] == 'none') {
@@ -322,8 +343,15 @@ class acheckerTFPDF extends tFPDF {
 		} else if ($problem_type == 'potential') {
 			$array = $this->potential;
 			$nr = $this->error_nr_potential;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin	
+		} else if ($problem_type == 'affirmed') {
+			$array = $this->affirmed;
+			$nr = $this->error_nr_affirmed;
+		} else if ($problem_type == 'checked') {
+			$array = $this->checked;
+			$nr = $this->error_nr_checked;
 		}
-		
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		if ($nr == '') $nr = 0;	
 		
 		// str with error type and nr of errors
@@ -645,7 +673,8 @@ class acheckerTFPDF extends tFPDF {
 	* $_gids: array of guidelines that were used as testing criteria
 	*/
 	public function	getPDF($title, $uri, $problem, $mode, $_gids) 
-	{		
+	{	
+		
 		// set filename
 		$date = AC_date('%Y-%m-%d');
 		$time = AC_date('%H-%i-%s');
@@ -681,6 +710,15 @@ class acheckerTFPDF extends tFPDF {
 					$this->AddPage();
 					$this->printCSS();
 				}
+				//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+				if(isset($_SESSION['user_id'])) {
+					$this->AddPage();
+					$this->printGuideline('affirmed');
+					$this->AddPage();
+					$this->printGuideline('checked');
+				}
+				//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+				
 			} else if ($problem == 'html') {
 				$this->printHTML();
 			} else if ($problem == 'css') {
@@ -705,6 +743,14 @@ class acheckerTFPDF extends tFPDF {
 					$this->AddPage();
 					$this->printCSS();
 				}
+				//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+				if(isset($_SESSION['user_id'])) {
+					$this->AddPage();
+					$this->printLine('affirmed');
+					$this->AddPage();
+					$this->printLine('checked');
+				}
+				//Added by Anirudh Subramanian for Achecker Manual Evaluations End
 			} else if ($problem == 'html') {
 				$this->printHTML();
 			} else if ($problem == 'css') {

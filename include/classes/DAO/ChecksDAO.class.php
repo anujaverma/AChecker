@@ -699,6 +699,49 @@ class ChecksDAO extends DAO {
 
 		return $this->execute($sql);
 	}
+	/*Added by Anirudh Subramanian for AChecker Manual Evaluations Begin*/
+	/**
+	* Return checks from the error type groups
+	* @access  public
+	* @param   $gid : group ID
+	* @return  table rows
+	* @author  Anirudh Subramanian
+	*/
+  
+	function getErrorTypeGroupLevelChecks($group_id)
+	{
+		$sql = "select distinct c.*, gc.group_id
+							from ". TABLE_PREFIX ."error_type_groups gs, 
+							     ". TABLE_PREFIX ."error_type_checks gc,
+							     ". TABLE_PREFIX ."checks c
+							where gs.group_id = ".intval($group_id)."
+							  and gs.group_id = gc.group_id
+							  and gc.check_id = c.check_id
+							  and c.open_to_public = 1
+							order by c.html_tag";
+
+		return $this->execute($sql);
+	}
+	/**
+	* Return checks for the HTML group
+	* @access  public
+	* @param   $gid : group ID
+	* @return  table rows
+	* @author  Anirudh Subramanian
+	*/	
+	function getHTMLGroupLevelChecks($group_id)
+	{
+		$sql = "select distinct c.*, gs.group_id
+							from ". TABLE_PREFIX ."error_type_groups gs, 
+							     ". TABLE_PREFIX ."checks c
+							where gs.group_id = ".intval($group_id)."
+							  and gs.abbr = c.html_tag
+							  and c.open_to_public = 1
+							order by c.html_tag";
+
+		return $this->execute($sql);
+	}
+	/*Added by Anirudh Subramanian for AChecker Manual Evaluations End*/
 
 	/**
 	* Return array of subgroups info whose name is null, and belong to the given group id

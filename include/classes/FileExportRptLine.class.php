@@ -31,15 +31,28 @@ class FileExportRptLine extends AccessibilityRpt {
 	var $group_known_problems = array();						// array of all info about known problems	
 	var $group_likely_problems = array();						// array of all info about likely problems
 	var $group_potential_problems = array();					// array of all info about potential problems
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	var $group_affirmed_problems = array();						// array of all info about affirmed problems
+	var $group_checked_warnings = array();						// array of all info about checked warnings
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations End			
+	
 	
 	var $group_likely_problems_no_decision = array();			// array of info about likely problems	no_decision
 	var $group_potential_problems_no_decision = array();		// array of info about potential problems	no_decision	
 	var $group_likely_problems_with_decision = array();			// array of info about likely problems	with_decision
 	var $group_potential_problems_with_decision = array();		// array of info about potential problems	with_decision	
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	var $group_affirmed_problems_with_decision = array();
+	var $group_checked_warnings_with_decision = array();
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 	
 	var $nr_known_problems = 0;
 	var $nr_likely_problems = 0;
 	var $nr_potential_problems = 0;
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	var $nr_affirmed_problems = 0;
+	var $nr_checked_warnings = 0;
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 	
 	/**
 	* public
@@ -57,8 +70,10 @@ class FileExportRptLine extends AccessibilityRpt {
 	* returns nr of errors - $nr_known_problems, $nr_likely_problems, $nr_potential_problems
 	*/
 	public function getErrorNr()
-	{
-		return array($this->nr_known_problems, $this->nr_likely_problems, $this->nr_potential_problems);
+	{	
+		//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		return array($this->nr_known_problems, $this->nr_likely_problems, $this->nr_potential_problems, $this->nr_affirmed_problems, $this->nr_checked_warnings);
+		//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
 	}
 	
 	/**
@@ -114,12 +129,18 @@ class FileExportRptLine extends AccessibilityRpt {
 		}
 		
 		$this->group_likely_problems['no_decision'] = $this->group_likely_problems_no_decision;
-		$this->group_likely_problems['with_decision'] = $this->group_likely_problems_with_decision;
+		$this->group_likely_problems['with_decision'] = $this->group_likely_problems_no_decision;
 		
 		$this->group_potential_problems['no_decision'] = $this->group_potential_problems_no_decision;
-		$this->group_potential_problems['with_decision'] = $this->group_potential_problems_with_decision;
+		$this->group_potential_problems['with_decision'] = $this->group_potential_problems_no_decision;
 		
-		return array($this->group_known_problems, $this->group_likely_problems, $this->group_potential_problems);
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		$this->group_affirmed_problems['with_decision'] = $this->group_affirmed_problems_with_decision;
+		$this->group_checked_warnings['with_decision'] = $this->group_checked_warnings_with_decision;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+		//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		return array($this->group_known_problems, $this->group_likely_problems, $this->group_potential_problems, $this->group_affirmed_problems, $this->group_checked_warnings);
+		//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
 	}
 	
 	/** 
@@ -137,8 +158,9 @@ class FileExportRptLine extends AccessibilityRpt {
 		// generate decision section
 		$userDecisionsDAO = new UserDecisionsDAO();		
 		$row = $userDecisionsDAO->getByUserLinkIDAndLineNumAndColNumAndCheckID($this->user_link_id, $line_number, $col_number, $check_row['check_id']);
-		
-		if (!$row || $row['decision'] == AC_DECISION_FAIL) { // no decision or decision of fail
+		//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		if (!$row) { // no decision or decision of fail
+		//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
 			if ($error_type == IS_WARNING) $this->nr_likely_problems++;
 			if ($error_type == IS_INFO) $this->nr_potential_problems++;
 		}
@@ -156,24 +178,40 @@ class FileExportRptLine extends AccessibilityRpt {
 		
 		if ($row && $row['decision'] == AC_DECISION_PASS) { // pass decision has been made, display "congrats" icon				
 			$decision_section = TRUE;
-			
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+			$this->nr_checked_warnings++;
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 			// generate problem section
 			$problem_section = $this->generate_problem_section($check_row['check_id'], $line_number, $col_number, $html_code, $image, $image_alt, 
 				$css_code, _AC($check_row['err']), _AC($check_row['how_to_repair']), $decision_section, $error_type);
-			
+			//Commented out by Anirudh Subramanian for AChecker Manual Evaluations Begin
+			/*
 			if ($error_type == IS_WARNING) $this->group_likely_problems_with_decision[] = $problem_section;
 			if ($error_type == IS_INFO) $this->group_potential_problems_with_decision[] = $problem_section;
+			*/
+			//Commented out by Anirudh Subramanian for AChecker Manual Evaluations End
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+			$this->group_checked_warnings_with_decision[] = $problem_section;
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		}
 		
 		if ($row && $row['decision'] == AC_DECISION_FAIL) { // pass decision has been made, display "congrats" icon				
 			$decision_section = FALSE;
-			
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+			$this->nr_affirmed_problems++;
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 			// generate problem section
 			$problem_section = $this->generate_problem_section($check_row['check_id'], $line_number, $col_number, $html_code, $image, $image_alt, 
 				$css_code, _AC($check_row['err']), _AC($check_row['how_to_repair']), $decision_section, $error_type);
-			
+			//Commented out by Anirudh Subramanian for AChecker Manual Evaluations Begin
+			/*
 			if ($error_type == IS_WARNING) $this->group_likely_problems_with_decision[] = $problem_section;
 			if ($error_type == IS_INFO) $this->group_potential_problems_with_decision[] = $problem_section;
+			*/
+			//Commented out by Anirudh Subramanian for AChecker Manual Evaluations End
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+			$this->group_affirmed_problems_with_decision[] = $problem_section;
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		}
 	}
 	

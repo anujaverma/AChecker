@@ -173,6 +173,7 @@ class UserDecisionsDAO extends DAO {
 			           AND column_num = ".$col_num."
 			           AND check_id = ".$check_id;
 			return $this->execute($sql);
+			
 		}
 		return true;
 	}

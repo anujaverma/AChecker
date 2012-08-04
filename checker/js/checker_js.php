@@ -44,5 +44,8 @@ AChecker.lang = AChecker.lang || {};
     AChecker.lang.get_seal = '<?php echo _AC('get_seal'); ?>';
     AChecker.lang.congrats_likely = '<?php echo $congrats_msg_for_likely; ?>';
     AChecker.lang.congrats_potential = '<?php echo $congrats_msg_for_potential; ?>';
-
+    //Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+    AChecker.lang.make_decision = '<?php echo _AC('make_decision'); ?>';
+    AChecker.lang.reverse_decision = '<?php echo _AC('reverse_decision'); ?>';
+    //Added by Anirudh Subramanian for AChecker Manual Evaluations End
 })();

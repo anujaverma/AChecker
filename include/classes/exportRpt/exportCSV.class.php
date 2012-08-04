@@ -38,6 +38,10 @@ class acheckerCSV {
 	var $known = array();
 	var $likely = array();
 	var $potential = array();
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	var $affirmed = array();
+	var $checked = array();
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 	var $html = array();
 	var $css = array();
 	
@@ -66,18 +70,26 @@ class acheckerCSV {
 	* $error_nr_html, $error_nr_css: nr of errors
 	* $css_error: empty if css validation was required with URL input, otherwise string with error msg
 	*/
-	function acheckerCSV($known, $likely, $potential, $html, $css, 
-		$error_nr_known, $error_nr_likely, $error_nr_potential, $error_nr_html, $error_nr_css, $css_error, $html_error)
+	function acheckerCSV($known, $likely, $potential, $affirmed, $checked, $html, $css, 
+		$error_nr_known, $error_nr_likely, $error_nr_potential, $error_nr_affirmed, $error_nr_checked, $error_nr_html, $error_nr_css, $css_error, $html_error)
 	{				
 		$this->known = $known;
 		$this->likely = $likely;
 		$this->potential = $potential;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		$this->affirmed = $affirmed;
+		$this->checked = $checked;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		$this->html = $html;	
 		$this->css = $css;	
 		
 		$this->error_nr_known = $error_nr_known;
 		$this->error_nr_likely = $error_nr_likely;
 		$this->error_nr_potential = $error_nr_potential;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		$this->error_nr_affirmed = $error_nr_affirmed;
+		$this->error_nr_checked = $error_nr_checked;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		$this->error_nr_html = $error_nr_html;
 		$this->error_nr_css = $error_nr_css;
 		
@@ -107,6 +119,12 @@ class acheckerCSV {
 			$file_content .= $this->getResultSection('known');
 			$file_content .= $this->getResultSection('likely');
 			$file_content .= $this->getResultSection('potential');
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+			if(isset($_SESSION['user_id'])){
+				$file_content .= $this->getResultSection('affirmed');
+				$file_content .= $this->getResultSection('checked');
+			}
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 			if ($this->error_nr_html != -1) $file_content .= $this->getHTML();
 			if ($this->error_nr_css != -1) $file_content .= $this->getCSS();
 		} else if ($problem == 'css') {
@@ -220,8 +238,17 @@ class acheckerCSV {
 			$array = $this->potential;
 			$nr = $this->error_nr_potential;
 			$file_content .= EOL._AC("potential_problems").': '.$nr.EOL;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		} else if ($problem_type == 'affirmed') {
+			$array = $this->affirmed;
+			$nr = $this->error_nr_affirmed;
+			$file_content .= EOL._AC("affirmed_problems").': '.$nr.EOL;
+		} else if ($problem_type == 'checked') {
+			$array = $this->checked;
+			$nr = $this->error_nr_checked;
+			$file_content .= EOL._AC("checked_warnings").': '.$nr.EOL;
 		}
-		
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		// show congratulations if no errors found
 		if ($nr == 0) {
 			// congrats message

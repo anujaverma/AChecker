@@ -32,6 +32,10 @@ class acheckerHTML {
 	var $known = array();
 	var $likely = array();
 	var $potential = array();
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	var $affirmed = array();
+	var $checked = array();
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 	var $html = '';
 	var $css = '';
 	
@@ -39,6 +43,10 @@ class acheckerHTML {
 	var $error_nr_known = 0;
 	var $error_nr_likely = 0;
 	var $error_nr_potential = 0;
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	var $error_nr_affirmed = 0;
+	var $error_nr_checked = 0;
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 	var $error_nr_html = 0;
 	var $error_nr_css = 0;
 	
@@ -106,18 +114,26 @@ span.congrats_msg { line-height: 120%; color: green; padding: 1em 1em; font-size
 	* $error_nr_html, $error_nr_css: nr of errors
 	* $css_error: empty if css validation was required with URL input, otherwise string with error msg
 	*/
-	function acheckerHTML($known, $likely, $potential, $html, $css, 
-		$error_nr_known, $error_nr_likely, $error_nr_potential, $error_nr_html, $error_nr_css, $css_error, $html_error)
+	function acheckerHTML($known, $likely, $potential, $affirmed, $checked, $html, $css, 
+		$error_nr_known, $error_nr_likely, $error_nr_potential, $error_nr_affirmed, $error_nr_checked, $error_nr_html, $error_nr_css, $css_error, $html_error)
 	{				
 		$this->known = $known;
 		$this->likely = $likely;
 		$this->potential = $potential;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		$this->affirmed = $affirmed;
+		$this->checked = $checked;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		$this->html = $html;	
 		$this->css = $css;	
 		
 		$this->error_nr_known = $error_nr_known;
 		$this->error_nr_likely = $error_nr_likely;
 		$this->error_nr_potential = $error_nr_potential;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		$this->error_nr_affirmed = $error_nr_affirmed;
+		$this->error_nr_checked = $error_nr_checked;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		$this->error_nr_html = $error_nr_html;
 		$this->error_nr_css = $error_nr_css;
 		
@@ -155,6 +171,12 @@ span.congrats_msg { line-height: 120%; color: green; padding: 1em 1em; font-size
 			$detail .= $this->getResultSection('known');
 			$detail .= '<br/>'.$this->getResultSection('likely');
 			$detail .= '<br/>'.$this->getResultSection('potential');
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+			if(isset($_SESSION['user_id'])){
+				$detail .= '<br/>'.$this->getResultSection('affirmed');
+				$detail .= '<br/>'.$this->getResultSection('checked');
+			}
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 			if ($this->error_nr_html != -1) $validation .= '<br/>'.$this->getHTML();
 			if ($this->error_nr_css != -1) $validation .= '<br/>'.$this->getCSS();
 		} else if ($problem == 'html') {
@@ -211,10 +233,25 @@ span.congrats_msg { line-height: 120%; color: green; padding: 1em 1em; font-size
 		else if ($problem == 'css') {
 			if ($this->error_nr_css != -1) $summary_detail .= $this->error_nr_css.' '._AC('css_validation_result').'&nbsp;&nbsp;';
 		}
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin 
+		else if ($problem == 'affirmed') {
+			$summary_detail .= $this->error_nr_affirmed.' '._AC('affirmed_problems').'&nbsp;&nbsp;';
+		}
+		else if ($problem == 'checked') {
+			$summary_detail .= $this->error_nr_checked.' '._AC('checked_warnings').'&nbsp;&nbsp;';
+		}
+		
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		else if ($problem == 'all'){
 			$summary_detail .= $this->error_nr_known. ' ' ._AC('errors').'&nbsp;&nbsp;';
 			$summary_detail .= $this->error_nr_likely.' '._AC('likely_problems').'&nbsp;&nbsp;';
 			$summary_detail .= $this->error_nr_potential.' '._AC('potential_problems').'&nbsp;&nbsp;';
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+			if(isset($_SESSION['user_id'])) {
+				$summary_detail .= $this->error_nr_affirmed.' '._AC('affirmed_problems').'&nbsp;&nbsp;';
+				$summary_detail .= $this->error_nr_checked.' '._AC('checked_warnings').'&nbsp;&nbsp;';  
+			}
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 			if ($this->error_nr_html != -1) $summary_detail .= $this->error_nr_html.' '._AC('html_validation_result').'&nbsp;&nbsp;';
 			if ($this->error_nr_css != -1) $summary_detail .= $this->error_nr_css.' '._AC('css_validation_result').'&nbsp;&nbsp;';
 		}
@@ -311,7 +348,42 @@ span.congrats_msg { line-height: 120%; color: green; padding: 1em 1em; font-size
 			return str_replace(array('{DETAIL_TITLE}', '{DIV_ID}', '{DETAIL}'),
 		           			array(_AC('potential_problems'), 'potential_problems', $congrats . $potential),
 		               		$this->html_detail);
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		} else if ($problem_type == 'affirmed') {
+			if ($this->error_nr_affirmed == 0) {
+				$congrats = "<ul><li class='msg_info'><span id='AC_congrats_msg_for_affirmed' class='congrats_msg'>
+						<img src='".AC_BASE_HREF."images/feedback.gif' alt='"._AC("feedback")."' />  "._AC("congrats_no_potential")."
+					</span></ul></li>";
+			}
+			
+			$affirmed = $this->htmlRpt->getAffirmedProblemRpt();
+			$pat = '/\<input value="Reverse Decision" type="submit" name="reverse\[(.*)\]" \/\>/';
+			if (preg_match($pat, $affirmed)) {
+			    $affirmed = preg_replace($pat, "", $affirmed);
+			}
+			
+			return str_replace(array('{DETAIL_TITLE}', '{DIV_ID}', '{DETAIL}'),
+		           			array(_AC('affirmed_problems'), 'affirmed_problems', $congrats . $affirmed),
+		               		$this->html_detail);
+		
+		} else if ($problem_type == 'checked') {
+			if ($this->error_nr_checked == 0) {
+				$congrats = "<ul><li class='msg_info'><span id='AC_congrats_msg_for_checked' class='congrats_msg'>
+						<img src='".AC_BASE_HREF."images/feedback.gif' alt='"._AC("feedback")."' />  "._AC("congrats_no_potential")."
+					</span></ul></li>";
+			}
+			
+			$checked = $this->htmlRpt->getCheckedWarningRpt();
+			$pat = '/\<input value="Reverse Decision" type="submit" name="reverse\[(.*)\]" \/\>/';
+			if (preg_match($pat, $checked)) {
+			    $checked = preg_replace($pat, "", $checked);
+			}
+			
+			return str_replace(array('{DETAIL_TITLE}', '{DIV_ID}', '{DETAIL}'),
+		           			array(_AC('checked_warnings'), 'checked_warnings', $congrats . $checked),
+		               		$this->html_detail);
 		}
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 	}
 
 	/**

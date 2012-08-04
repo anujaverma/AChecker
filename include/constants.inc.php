@@ -125,6 +125,9 @@ define('DEFAULT_GUIDELINE', 8);
 // report formats
 define('REPORT_FORMAT_GUIDELINE', 1);
 define('REPORT_FORMAT_LINE', 2);
+// Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+define('REPORT_FORMAT_HTML_TAG', 3);
+// Added by Anirudh Subramanian for Achecker Manual Evaluations End
 
 /* how many days until the password reminder link expires */
 define('AC_PASSWORD_REMINDER_EXPIRY', 2);

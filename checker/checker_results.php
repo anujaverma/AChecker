@@ -17,6 +17,9 @@ if (!isset($aValidator) && !isset($htmlValidator)) die(_AC("no_instance"));
 
 include_once(AC_INCLUDE_PATH. "classes/HTMLRpt.class.php");
 include_once(AC_INCLUDE_PATH. "classes/HTMLByGuidelineRpt.class.php");
+// Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+include_once(AC_INCLUDE_PATH. "classes/HTMLByErrorTypeRpt.class.php");
+// Added by Anirudh Subramanian for AChecker Manual Evaluations End
 include_once(AC_INCLUDE_PATH. "classes/Utility.class.php");
 include_once(AC_INCLUDE_PATH. "classes/DAO/UserLinksDAO.class.php");
 include_once(AC_INCLUDE_PATH. "classes/DAO/UserDecisionsDAO.class.php");
@@ -110,7 +113,10 @@ if (isset($aValidator))
 	} else if ($_POST["rpt_format"] == REPORT_FORMAT_LINE) {
 		$a_rpt = new HtmlRpt($errors, $user_link_id);
 		$_SESSION['input_form']['mode'] = 'line';
-	}
+	} else if ($_POST["rpt_format"] == REPORT_FORMAT_HTML_TAG) {//Block Added by Anirudh Subramanian for AChecker Manual Evaluations Begin  
+		$a_rpt = new HTMLByErrorTypeRpt($errors,$_gids[0], $user_link_id);
+		//$a_rpt = new HtmlRpt($errors,$user_link_id);
+	}//Block Added by Anirudh Subramanian for AChecker Manual Evaluations End
 	$a_rpt->setAllowSetDecisions($allow_set_decision);
 	$a_rpt->setFromReferer($from_referer);
 	if (isset($_REQUEST['show_source'])) $a_rpt->setShowSource('true', $source_array);
@@ -119,9 +125,27 @@ if (isset($aValidator))
 	
 	$num_of_errors = $a_rpt->getNumOfErrors();
 	$num_of_likely_problems = $a_rpt->getNumOfLikelyProblems();
-	$num_of_likely_problems_no_decision = $a_rpt->getNumOfLikelyWithFailDecisions();
+	//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	//$num_of_likely_problems_no_decision = $a_rpt->getNumOfLikelyWithFailDecisions();
+	if ($allow_set_decision == 'true' ) {
+		$num_of_likely_problems_no_decision = $a_rpt->getNumOfLikelyNoDecisions();
+	} else {
+		$num_of_likely_problems_no_decision = $num_of_likely_problems;
+	}
+	//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
 	$num_of_potential_problems = $a_rpt->getNumOfPotentialProblems();
-	$num_of_potential_problems_no_decision = $a_rpt->getNumOfPotentialWithFailDecisions();
+	//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	//$num_of_potential_problems_no_decision = $a_rpt->getNumOfPotentialWithFailDecisions();
+	if ($allow_set_decision == 'true' ) {
+		$num_of_potential_problems_no_decision = $a_rpt->getNumOfPotentialNoDecisions();
+	} else {
+		$num_of_potential_problems_no_decision = $num_of_potential_problems;
+	}
+	//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	$num_of_checked_warnings = $a_rpt->getNumOfCheckedWarnings();
+	$num_of_affirmed_problems = $a_rpt->getNumOfAffirmedProblems();
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 	
 	// no any problems or all problems have pass decisions, display seals when no errors
 	$seals = null;
@@ -139,7 +163,12 @@ if (isset($aValidator))
 	$savant->assign('num_of_likely_problems_no_decision', $num_of_likely_problems_no_decision);
 	$savant->assign('num_of_potential_problems', $num_of_potential_problems);
 	$savant->assign('num_of_potential_problems_no_decision', $num_of_potential_problems_no_decision);
-
+	
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	$savant->assign('num_of_checked_warnings', $num_of_checked_warnings);
+	$savant->assign('num_of_affirmed_problems', $num_of_affirmed_problems);
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+	
 	$savant->assign('aValidator', $aValidator);
 	$savant->assign('guidelines_text', $guidelines_text);
 	$savant->assign('num_of_total_a_errors', $num_of_total_a_errors);

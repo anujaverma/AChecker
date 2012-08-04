@@ -40,12 +40,21 @@ class AccessibilityRpt {
 	var $num_of_likely_problems;         // Number of likely errors. (db: checks.confidence = "Likely")
 	var $num_of_potential_problems;      // Number of potential errors. (db: checks.confidence = "Potential")
 	
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	var $num_of_affirmed_problems;
+	var $num_of_checked_warnings;
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+	
 	var $num_of_no_decisions;            // Number of likely/potential errors that decisions have not been made
 	var $num_of_made_decisions;            // Number of likely/potential errors that decisions have been made
 	
 	var $rpt_errors;                     // <DIV> section of errors
 	var $rpt_likely_problems;            // <DIV> section of likely problems
 	var $rpt_potential_problems;         // <DIV> section of potential problems
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	var $rpt_affirmed_problems;
+	var $rpt_checked_warnings;
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 	var $rpt_source;                     // <DIV> section of source code used for validation
 	
 	/**
@@ -65,10 +74,18 @@ class AccessibilityRpt {
 		$this->num_of_errors = 0;
 		$this->num_of_likely_problems = 0;
 		$this->num_of_potential_problems = 0;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		$this->num_of_affirmed_problems = 0;
+		$this->num_of_checked_warnings = 0;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		
 		$this->rpt_errors = "";
 		$this->rpt_likely_problems = "";
 		$this->rpt_potential_problems = "";
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		$this->rpt_affirmed_problems = "";
+		$this->rpt_checked_warnings = "";
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 	}
 	
 	/**
@@ -173,7 +190,28 @@ class AccessibilityRpt {
 	{
 		return $this->rpt_potential_problems;
 	}
-
+	/*Added by Anirudh Subramanian for AChecker Manual Evaluations Begin*/
+	/**
+	* public
+	* return validation error report in html
+	* for affirmed problems
+	*/
+	public function getAffirmedProblemRpt()
+	{
+		return $this->rpt_affirmed_problems;
+	}
+	
+	/**
+	* public
+	* return validation error report in html
+	* for checked warnings
+	*/
+	
+	public function getCheckedWarningRpt()
+	{
+		return $this->rpt_checked_warnings;
+	}
+	/*Added by Anirudh Subramanian for AChecker Manual Evaluations End*/
 	/**
 	* public 
 	* return number of known errors
@@ -185,7 +223,7 @@ class AccessibilityRpt {
 	
 	/**
 	* public 
-	* return number of known errors
+	* return number of likely problems
 	*/
 	public function getNumOfLikelyProblems()
 	{
@@ -194,12 +232,33 @@ class AccessibilityRpt {
 	
 	/**
 	* public 
-	* return number of known errors
+	* return number of potential problems
 	*/
 	public function getNumOfPotentialProblems()
 	{
 		return $this->num_of_potential_problems;
 	}
+	
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	/**
+	* public 
+	* return number of affirmed problems
+	*/	
+	public function getNumOfAffirmedProblems()
+	{
+		return $this->num_of_affirmed_problems;	
+	}
+	
+	/**
+	* public 
+	* return number of checked warnings
+	*/
+	public function getNumOfCheckedWarnings()
+	{
+		return $this->num_of_checked_warnings;	
+	}
+	
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 
 	/**
 	* public 

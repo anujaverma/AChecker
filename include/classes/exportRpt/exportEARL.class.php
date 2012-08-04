@@ -30,6 +30,11 @@ class acheckerEARL {
 	var $known = array();
 	var $likely = array();
 	var $potential = array();
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	var $affirmed = array();
+	var $checked = array();
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+	
 	var $html = array();
 	var $css = array();
 	
@@ -37,6 +42,10 @@ class acheckerEARL {
 	var $error_nr_known = 0;
 	var $error_nr_likely = 0;
 	var $error_nr_potential = 0;
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+	var $error_nr_affirmed = 0;
+	var $error_nr_checked = 0;
+	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 	var $error_nr_html = 0;
 	var $error_nr_css = 0;
 	
@@ -62,18 +71,26 @@ class acheckerEARL {
 	* $error_nr_html, $error_nr_css: nr of errors
 	* $css_error: empty if css validation was required with URL input, otherwise string with error msg
 	*/
-	function acheckerEARL($known, $likely, $potential, $html, $css, 
-		$error_nr_known, $error_nr_likely, $error_nr_potential, $error_nr_html, $error_nr_css, $css_error, $html_error)
+	function acheckerEARL($known, $likely, $potential, $affirmed, $checked, $html, $css, 
+		$error_nr_known, $error_nr_likely, $error_nr_potential, $error_nr_affirmed, $error_nr_checked, $error_nr_html, $error_nr_css, $css_error, $html_error)
 	{				
 		$this->known = $known;
 		$this->likely = $likely;
 		$this->potential = $potential;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		$this->affirmed = $affirmed;
+		$this->checked = $checked;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		$this->html = $html;	
 		$this->css = $css;	
 		
 		$this->error_nr_known = $error_nr_known;
 		$this->error_nr_likely = $error_nr_likely;
 		$this->error_nr_potential = $error_nr_potential;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		$this->error_nr_affirmed = $error_nr_affirmed;
+		$this->error_nr_checked = $error_nr_checked;
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		$this->error_nr_html = $error_nr_html;
 		$this->error_nr_css = $error_nr_css;
 		
@@ -107,6 +124,12 @@ class acheckerEARL {
 			$file_content .= $this->getResultSection('known', $input_content_type);
 			$file_content .= $this->getResultSection('likely', $input_content_type);
 			$file_content .= $this->getResultSection('potential', $input_content_type);
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+			if (isset($_SESSION['user_id'])) {
+				$file_content .= $this->getResultSection('affirmed', $input_content_type);
+				$file_content .= $this->getResultSection('checked', $input_content_type);
+			}
+			//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 			if ($this->error_nr_html != -1) $file_content .= $this->getHTML($input_content_type);
 			if ($this->error_nr_css != -1) $file_content .= $this->getCSS();
 		} else if ($problem == 'html') {
@@ -495,8 +518,21 @@ class acheckerEARL {
 			$this->problem_prefix = 'potential';
 			$file_content .= '<!-- ========================== Potential problems ========================== -->
 		';
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		} else if ($problem_type == 'affirmed') {
+			$array = $this->affirmed;
+			$nr = $this->error_nr_affirmed;
+			$this->problem_prefix = 'affirmed';
+			$file_content .= '<!-- ========================== Affirmed problems ========================== -->
+		';
+		} else if ($problem_type == 'checked') {
+			$array = $this->checked;
+			$nr = $this->error_nr_checked;
+			$this->problem_prefix = 'checked';
+			$file_content .= '<!-- ========================== Checked warnings ========================== -->
+		';
 		}
-		
+		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		// show congratulations if no errors found
 		if ($nr == 0) {
 			$file_content .= '<earl:TestResult rdf:ID="result_'.$this->problem_prefix.$this->error_id.'">

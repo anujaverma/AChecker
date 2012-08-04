@@ -114,11 +114,16 @@ if (isset($_POST["enable_html_validation"])) {
 }
 
 if (!is_array($_gids)) { // $_gids hasn't been set at validating referer URIs
-	if ($_POST["rpt_format"] == REPORT_FORMAT_GUIDELINE) {
+	if ($_POST["rpt_format"] == REPORT_FORMAT_GUIDELINE) { 
 		$_gids = $_POST["radio_gid"];
 	} else if ($_POST["rpt_format"] == REPORT_FORMAT_LINE) {
 		$_gids = $_POST["checkbox_gid"];
-	} else {
+	} else if ($_POST["rpt_format"] == REPORT_FORMAT_HTML_TAG) {//Block Added by Anirudh Subramanian for AChecker Manual Evaluations Begin 
+		$_gids = $_POST["checkbox_gid"];
+		//Block Added by Anirudh Subramanian for Achecker Manual Evaluations End
+	}
+	
+	else {
 		$_gids = $_POST["gid"];
 	}
 	$_SESSION['input_form']['gids'] = $_gids;

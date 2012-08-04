@@ -9,24 +9,25 @@
 /* modify it under the terms of the GNU General Public License          */
 /* as published by the Free Software Foundation.                        */
 /************************************************************************/
-// $Id: HTMLRpt.class.php 490 2011-02-04 19:22:32Z cindy $
+// $Id$
 
 /**
 * HTMLRpt
 * Class to generate error report in html format 
 * @access	public
-* @author	Cindy Qi Li
+* @author	Anirudh Subramanian
 * @package checker
 */
+
 if (!defined("AC_INCLUDE_PATH")) die("Error: AC_INCLUDE_PATH is not defined.");
 include_once(AC_INCLUDE_PATH.'classes/DAO/UserDecisionsDAO.class.php');
 include_once(AC_INCLUDE_PATH.'classes/AccessibilityRpt.class.php');
 include_once(AC_INCLUDE_PATH.'classes/DAO/GuidelinesDAO.class.php');
-include_once(AC_INCLUDE_PATH.'classes/DAO/GuidelineGroupsDAO.class.php');
-include_once(AC_INCLUDE_PATH.'classes/DAO/GuidelineSubgroupsDAO.class.php');
+include_once(AC_INCLUDE_PATH.'classes/DAO/ErrorTypeGroupsDAO.class.php');
 include_once(AC_INCLUDE_PATH.'classes/DAO/ChecksDAO.class.php');
 
-class HTMLByGuidelineRpt extends AccessibilityRpt {
+
+class HTMLByErrorTypeRpt extends AccessibilityRpt {
 
 	// all private
 	var $gid;                            // Guideline id to report on
@@ -52,27 +53,15 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 	
 	var $checksDAO;
-	var $guidelineGroupsDAO;
-	var $guidelineSubgroupsDAO;
+	var $errorTypeGroupsDAO;
 	
 	var $html_group =
 '<h3>{GROUP_NAME}</h3><br/>
 ';
-
-	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
-	var $html_group_hidden =
+	var $html_group_hidden = 
 '<h3 hidden="true">{GROUP_NAME}</h3><br/>
-';	
-	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+';
 
-	var $html_subgroup = 
-'<h4>{SUBGROUP_NAME}</h4><br/>
-';
-	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
-	var $html_subgroup_hidden = 
-'<h4 hidden="true">{SUBGROUP_NAME}</h4><br/>
-';
-	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 	var $html_checks_table = 
 '        <div class="gd_one_check"> 
            <span class="gd_msg">{CHECK_LABEL} {CHECK_ID}: 
@@ -92,8 +81,7 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
            </table>
          </div>
 ';
-	
-	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin 
+
 	var $html_checks_table_hidden = 
 '        <div class="gd_one_check" hidden="true"> 
            <span class="gd_msg">{CHECK_LABEL} {CHECK_ID}: 
@@ -113,7 +101,7 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
            </table>
          </div>
 ';
-	//Added by Anirudh Subramanian for AChecker Manual Evaluations End 
+	
 	var $html_tr_header =
 '           <tr class="gd_th">
              <td width="5%">{PASS_TEXT}<br /><input type="checkbox" class="AC_selectAllCheckBox" id="selectall_{CHECK_ID}" name="selectall_{CHECK_ID}" title="{SELECT_ALL_TEXT}" /></th>
@@ -121,15 +109,13 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
            </tr>
 ';
 
-	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
-	var $html_tr_header_hidden =
-'           <tr class="gd_th" hidden = "true">
+	var $html_tr_header_hidden = 
+'           <tr class="gd_th">
              <td width="5%">{PASS_TEXT}<br /><input type="checkbox" class="AC_selectAllCheckBox" id="selectall_{CHECK_ID}" name="selectall_{CHECK_ID}" title="{SELECT_ALL_TEXT}" /></th>
              <td width="95%"><label for="selectall_{CHECK_ID}">{SELECT_ALL_TEXT}</label></th>
            </tr>
 ';	
-	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
-
+	
 	var $html_tr_with_decision =
 '           <tr {ROW_SELECTED}>
              <td width="5%">{CHECKBOX}</td>
@@ -137,14 +123,12 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
            </tr>
 ';
 
-	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
 	var $html_tr_with_decision_hidden =
 '           <tr {ROW_SELECTED} hidden = "true">
-             <td width="5%">{CHECKBOX}</td>
-             <td width="95%" class="AC_problem_detail">{PROBLEM_DETAIL}</td>
-           </tr>
-';	
-	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+	    <td width="5%">{CHECKBOX}</td>
+	    <td width="95%" class="AC_problem_detail">{PROBLEM_DETAIL}</td>
+	  </tr>
+';
 
 	var $html_tr_without_decision =
 '           <tr>
@@ -165,14 +149,12 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
          </p>
          {CSS_CODE}
 ';
-
 	var $label_start = '<label for="{CHECKBOX_ID}">';
 	var $label_end = '</label>';
 	
 	var $html_repair = 
 '         <span style="font-weight:bold">{REPAIR_LABEL}: </span>{REPAIR_DETAIL}
 ';
-
 	
 	var $html_question = 
 '         <table>
@@ -181,6 +163,7 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
            <tr><th>{FAIL_LABEL}:</th><td>{FAIL_ANSWER}</td></tr>
          </table>
 ';
+	
 	var $html_make_decision_button = 
 '  <tr>
     <td colspan="2">
@@ -190,7 +173,6 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
   </tr>
 ';
 
-//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
 	var $html_reverse_decision_button = 
 '  <tr>
     <td colspan="2">
@@ -199,7 +181,7 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
     </td>
   </tr>
 ';
-//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+
 
 	var $html_congrats =
 '<p><img alt="{CONGRATS_ALT}" src="/images/feedback.gif" />{CONGRATS_TEXT}<br /></p>
@@ -214,34 +196,32 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 	var $html_source_line =
 '		<li id="line-{LINE_ID}">{LINE}</li>
 ';
-	
+
 	/**
 	* public
 	* $errors: an array, output of AccessibilityValidator -> getValidationErrorRpt
 	* $type: html
 	*/
-	function HTMLByGuidelineRpt($errors, $gid, $user_link_id = '')
+	function HTMLByErrorTypeRpt($errors, $gid, $user_link_id = '')
 	{
 		// run parent constructor
 		parent::AccessibilityRpt($errors, $user_link_id);
 		
 		$this->gid = $gid;
 		
-		$this->num_of_no_decisions = 0;
+		$this->num_of_no_decisions   = 0;
 		$this->num_of_made_decisions = 0;
-		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		
 		$this->num_of_likely_no_decisions = 0;
 		$this->num_of_potential_no_decisions = 0;
 		$this->num_of_affirmed_problems = 0;
 		$this->num_of_checked_warnings = 0;
-		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		
-		$this->num_of_likely_problems_fail = 0;
+		$this->num_of_likely_problems_fail    = 0;
 		$this->num_of_potential_problems_fail = 0;
 		
-		$this->checksDAO = new ChecksDAO();
-		$this->guidelineGroupsDAO = new GuidelineGroupsDAO();
-		$this->guidelineSubgroupsDAO = new GuidelineSubgroupsDAO();
+		$this->checksDAO          = new ChecksDAO();
+		$this->errorTypeGroupsDAO = new ErrorTypeGroupsDAO();
 	}
 	
 	/**
@@ -252,31 +232,17 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 	{
 		global $msg;
 
-		$group_known_problems = "";
-		$group_likely_problems = "";
+		$group_known_problems     = "";
+		$group_likely_problems    = "";
 		$group_potential_problems = "";
-		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
 		$group_affirmed_problems = "";
 		$group_checked_warnings = "";
-		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
-		
 		
 		$this->errors_by_checks = $this->rearrange_errors_array($this->errors);
 
-		// display guideline level checks
-		$guidelineLevel_checks = $this->checksDAO->getGuidelineLevelChecks($this->gid);
-		
-		if (is_array($guidelineLevel_checks))
-		{
-			//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
-			list($guideline_level_known_problems, $guideline_level_likely_problems, $guideline_level_potential_problems, 
-			$guideline_level_affirmed_problems, $guideline_level_checked_warnings, $no_guideline_level_affirmed_problems,$no_guideline_level_checked_warnings, $hide_title_guideline_level_likely_problems, $hide_title_guideline_level_potential_problems, $is_likely_problem_guideline, $is_potential_problem_guideline) =
-				$this->generateChecksTable($guidelineLevel_checks);
-			//Modified by Anirudh Subramanian for AChecker Manual Evaluations End	
-		}
 		
 		// display named guidelines and their checks 
-		$named_groups = $this->guidelineGroupsDAO->getNamedGroupsByGuidelineID($this->gid);
+		$named_groups = $this->errorTypeGroupsDAO->getAllGroups();
 		
 		if (is_array($named_groups))
 		{
@@ -285,208 +251,103 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 				$group_level_known_problems = "";
 				$group_level_likely_problems = "";
 				$group_level_potential_problems = "";
-				//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
 				$group_level_affirmed_problems = "";
 				$group_level_checked_warnings = "";
-				//Added by Anirudh Subramanian for AChecker Manual Evaluations End
-				
-				$subgroup_known_problems = "";
-				$subgroup_likely_problems = "";
-				$subgroup_potential_problems = "";
-				//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
-				$subgroup_affirmed_problems = "";
-				$subgroup_checked_warnings = "";
-				//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+				$no_of_likely_problems_group_title_hidden = 0;
+				$no_of_potential_problems_group_title_hidden = 0;
+				$no_group_likely_problems = 0;
+				$no_group_potential_problems = 0;
+				$no_of_group_title_affirmed_problems = 0;
+				$no_of_group_title_checked_warnings = 0;
 		
 				// get group level checks: the checks in subgroups without subgroup names
-				$groupLevel_checks = $this->checksDAO->getGroupLevelChecks($group['group_id']);
+				$groupLevel_checks = $this->checksDAO->getHTMLGroupLevelChecks($group['group_id']);
+				
 				
 				if (is_array($groupLevel_checks))
 				{
-					//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
-					list($group_level_known_problems, $group_level_likely_problems, $group_level_potential_problems, 
-					$group_level_affirmed_problems, $group_level_checked_warnings, $no_of_group_level_affirmed_problems, 
-					$no_of_group_level_checked_warnings, $hide_title_group_level_likely_problems, $hide_title_group_level_potential_problems, $is_likely_problem_group, $is_potential_problem_group) = 
+					list($group_level_known_problems, $group_level_likely_problems, $group_level_potential_problems,
+					$group_level_affirmed_problems, $group_level_checked_warnings, $no_of_group_level_affirmed_problems, $no_of_group_level_checked_warnings, $hide_title_group_level_likely_problems, $hide_title_group_level_potential_problems) = 
 						$this->generateChecksTable($groupLevel_checks);
-					//Modified by Anirudh Subramanian for AChecker Manual Evaluations End	
-				}
+					$group_title = str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group);
+					$group_title_likely_problems = str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group);
+					$group_title_potential_problems = str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group);
 				
-				// display named subgroups and their checks
-				$named_subgroups = $this->guidelineSubgroupsDAO->getNamedSubgroupByGroupID($group['group_id']);
-				if (is_array($named_subgroups))
-				{
-					//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
-						$no_of_likely_problems_subgroup_title_hidden = 0;
-						$no_of_potential_problems_subgroup_title_hidden = 0;
-						$no_subgroup_likely_problems = 0;
-						$no_subgroup_potential_problems = 0;
-						$no_of_subgroup_title_affirmed_problems = 0;
-						$no_of_subgroup_title_checked_warnings = 0;
-					//Added by Anirudh Subramanian for AChecker Manual Evaluations End
-					foreach ($named_subgroups as $subgroup)
-					{						
-						$subgroup_checks = $this->checksDAO->getChecksBySubgroupID($subgroup['subgroup_id']);
-						if (is_array($subgroup_checks))
-						{	 
-							
-							// get html of all the problems in this subgroup
-							//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
-							list($known_problems, $likely_problems, $potential_problems, 
-							$affirmed_problems, $checked_warnings, $no_of_subgroup_level_affirmed_problems, $no_of_subgroup_level_checked_warnings,$hide_title_subgroup_level_likely_problems, $hide_title_subgroup_level_potential_problems,$is_likely_problem_subgroup,$is_potential_problem_subgroup) = 
-								$this->generateChecksTable($subgroup_checks);							
-							//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
-							$subgroup_title = str_replace("{SUBGROUP_NAME}", _AC($subgroup['name']), $this->html_subgroup);
-							//Added  by Anirudh Subramanian for AChecker Manual Evaluations Begin
-							$subgroup_title_likely_problems = str_replace("{SUBGROUP_NAME}", _AC($subgroup['name']), $this->html_subgroup);
-							$subgroup_title_potential_problems = str_replace("{SUBGROUP_NAME}", _AC($subgroup['name']), $this->html_subgroup);
-							if($no_of_subgroup_level_affirmed_problems > 0) {
-								if($hide_title_subgroup_level_likely_problems) {
-									$subgroup_title_likely_problems = str_replace("{SUBGROUP_NAME}", _AC($subgroup['name']), $this->html_subgroup_hidden);
-									$hide_title_subgroup_level_likely_problems = false;
-									$no_of_likely_problems_subgroup_title_hidden++;
-								}/*else{
-									if(!$is_likely_problem_subgroup) {
-										$subgroup_title_likely_problems = str_replace("{SUBGROUP_NAME}", _AC($subgroup['name']), $this->html_subgroup_hidden);
-									}
-								}*/
-								if($hide_title_subgroup_level_potential_problems) {
-									$subgroup_title_potential_problems = str_replace("{SUBGROUP_NAME}", _AC($subgroup['name']), $this->html_subgroup_hidden);
-									$hide_title_subgroup_level_potential_problems = false;
-									$no_of_potential_problems_subgroup_title_hidden++;
-								}/*else{
-									if(!$is_potential_problem_subgroup){
-										$subgroup_title_potential_problems = str_replace("{SUBGROUP_NAME}", _AC($subgroup['name']), $this->html_subgroup_hidden);
-									}
-								}*/
-							
-								$subgroup_title_affirmed_problems =  str_replace("{SUBGROUP_NAME}", _AC($subgroup['name']), $this->html_subgroup);
-								$no_of_subgroup_title_affirmed_problems++;
-							}else{
-								$subgroup_title_affirmed_problems =  str_replace("{SUBGROUP_NAME}", _AC($subgroup['name']), $this->html_subgroup_hidden);
-							}
-							if($no_of_subgroup_level_checked_warnings > 0) {
-								if($hide_title_subgroup_level_likely_problems) {
-									$subgroup_title_likely_problems = str_replace("{SUBGROUP_NAME}", _AC($subgroup['name']), $this->html_subgroup_hidden);
-									$no_of_likely_problems_subgroup_title_hidden++;
-								}/*else{
-									if(!$is_likely_problem_subgroup) {
-										$subgroup_title_likely_problems = str_replace("{SUBGROUP_NAME}", _AC($subgroup['name']), $this->html_subgroup_hidden);
-									}								
-								}*/
-								
-								if($hide_title_subgroup_level_potential_problems) {
-									$subgroup_title_potential_problems = str_replace("{SUBGROUP_NAME}", _AC($subgroup['name']), $this->html_subgroup_hidden);
-									$no_of_potential_problems_subgroup_title_hidden++;
-								}/*else{
-									if(!$is_potential_problem_subgroup){
-										$subgroup_title_potential_problems = str_replace("{SUBGROUP_NAME}", _AC($subgroup['name']), $this->html_subgroup_hidden);
-									}
-								}*/
-								$subgroup_title_checked_warnings =  str_replace("{SUBGROUP_NAME}", _AC($subgroup['name']), $this->html_subgroup);
-								$no_of_subgroup_title_checked_warnings++;
-							}else{
-								$subgroup_title_checked_warnings =  str_replace("{SUBGROUP_NAME}", _AC($subgroup['name']), $this->html_subgroup_hidden);
-							}
-							
-							//Added by Anirudh Subramanian for AChecker Manual Evaluations End
-							if ($known_problems <> "") {
-								$subgroup_known_problems .= $subgroup_title.$known_problems;
-							} 
-							if ($likely_problems <> "") {
-								$no_subgroup_likely_problems++;
-								$subgroup_likely_problems .= $subgroup_title_likely_problems.$likely_problems;
-							}  
-							
-							if ($potential_problems <> "") {
-								$no_subgroup_potential_problems++;
-								$subgroup_potential_problems .= $subgroup_title_potential_problems.$potential_problems;
-							} 
-							//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
-							if ($affirmed_problems <> "") {
-								$subgroup_affirmed_problems .= $subgroup_title_affirmed_problems.$affirmed_problems;							
-							}
-							if ($checked_warnings <> "") {
-								$subgroup_checked_warnings .= $subgroup_title_checked_warnings.$checked_warnings;
-							}
-							
-							
-							//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+					if($no_of_group_level_affirmed_problems > 0) { 
+						if($hide_title_group_level_likely_problems) {
+							$group_title_likely_problems = str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group_hidden);
+							$no_of_likely_problems_group_title_hidden++;
+							$hide_title_group_level_likely_problems = false;
 						}
-					} // end of foreach $named_subgroups
-				} // end of if $named_subgroups
-				//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
-				$no_of_subgroups_for_group = count($named_subgroups);				
-				//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+						if($hide_title_group_level_potential_problems) {
+							$group_title_potential_problems = str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group_hidden);
+							$no_of_potential_problems_group_title_hidden++;
+							$hide_title_group_level_potential_problems = false;
+						}
+					
+						$group_title_affirmed_problems =  str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group);
+						$no_of_group_title_affirmed_problems++;
+					}else{
+						$group_title_affirmed_problems =  str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group_hidden);
+					}
+					if($no_of_group_level_checked_warnings > 0) {
+						if($hide_title_group_level_likely_problems) {
+							$group_title_likely_problems = str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group_hidden);
+							$no_of_likely_problems_group_title_hidden++;
+						}
+						if($hide_title_group_level_potential_problems) {
+							$group_title_potential_problems = str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group_hidden);
+							$no_of_potential_problems_group_title_hidden++;								
+						}
+						$group_title_checked_warnings =  str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group);
+						$no_of_group_title_checked_warnings++;
+					}else{
+						$group_title_checked_warnings =  str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group_hidden);
+					}
+				}				
 				
-				$group_title = str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group);
-				$group_title_likely_problems = str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group);
-				$group_title_potential_problems = str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group);
-				
-				//Added by Anirudh Subramanian for Achecker Manual Evaluations begin
-				if($no_of_subgroup_title_affirmed_problems > 0 || $no_of_group_level_affirmed_problems > 0){
-					$group_title_affirmed_problems = str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group);
-				}else{
-					$group_title_affirmed_problems = str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group_hidden);
-				}
-				if($no_of_subgroup_title_checked_warnings > 0 || $no_of_group_level_checked_warnings > 0){
-					$group_title_checked_warnings = str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group);
-				}else{
-					$group_title_checked_warnings = str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group_hidden);
-				}
-				if($no_of_likely_problems_subgroup_title_hidden == $no_subgroup_likely_problems) {
-					$group_title_likely_problems = str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group_hidden);
-				}
-				if($no_of_potential_problems_subgroup_title_hidden == $no_subgroup_potential_problems) {
-					$group_title_potential_problems = str_replace("{GROUP_NAME}", _AC($group['name']), $this->html_group_hidden);
-				}
-				//Added by Anirudh Subramanian for AChecker Manual Evaluations End
-				
-				
-				if ($group_level_known_problems <> '' || $subgroup_known_problems <> ''){
-					$group_known_problems .= $group_title.$group_level_known_problems.$subgroup_known_problems;
+				if ($group_level_known_problems <> ''){
+					$group_known_problems .= $group_title.$group_level_known_problems;
 				} 
-				if ($group_level_likely_problems <> '' || $subgroup_likely_problems <> ''){
-					$group_likely_problems .= $group_title_likely_problems.$group_level_likely_problems.$subgroup_likely_problems;
+				if ($group_level_likely_problems <> ''){
+					$no_group_likely_problems++;
+					$group_likely_problems .= $group_title_likely_problems.$group_level_likely_problems;
 				} 
-				if ($group_level_potential_problems <> '' || $subgroup_potential_problems <> ''){
-					$group_potential_problems .= $group_title_potential_problems.$group_level_potential_problems.$subgroup_potential_problems;
+				if ($group_level_potential_problems <> ''){
+					$no_group_potential_problems++;
+					$group_potential_problems .= $group_title_potential_problems.$group_level_potential_problems;
 				}
-				//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
-				if ($group_level_affirmed_problems <> '' || $subgroup_affirmed_problems <> ''){
-					$group_affirmed_problems .= $group_title_affirmed_problems.$group_level_affirmed_problems.$subgroup_affirmed_problems;
+				if ($group_level_affirmed_problems <> ''){
+					$group_affirmed_problems .= $group_title_affirmed_problems.$group_level_affirmed_problems;
 				}
-				if ($group_level_checked_warnings <> '' || $subgroup_checked_warnings <> ''){
-					$group_checked_warnings .= $group_title_checked_warnings.$group_level_checked_warnings.$subgroup_checked_warnings;
+				if ($group_level_checked_warnings <> ''){
+					$group_checked_warnings .= $group_title_checked_warnings.$group_level_checked_warnings;
 				}
-				//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 			} // end of foreach $named_groups 	
 		} // end of if $named_groups
 		
-		if ($guideline_level_known_problems <> "" || $group_known_problems <> "") {
-			$this->rpt_errors = $guideline_level_known_problems . $group_known_problems;
+		if ($group_known_problems <> "") {
+			$this->rpt_errors = $group_known_problems;
 		} 
-		if ($guideline_level_likely_problems <> "" || $group_likely_problems <> "") {
-			$this->rpt_likely_problems = $guideline_level_likely_problems . $group_likely_problems;
+		if ($group_likely_problems <> "") {
+			$this->rpt_likely_problems = $group_likely_problems;
 		} 
-		if ($guideline_level_potential_problems <> "" || $group_potential_problems <> "") {
-			$this->rpt_potential_problems = $guideline_level_potential_problems . $group_potential_problems;
-		}		
-		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
-		if ($guideline_level_affirmed_problems <> "" || $group_affirmed_problems <> "") {
-			$this->rpt_affirmed_problems = $guideline_level_affirmed_problems . $group_affirmed_problems;
+		if ($group_potential_problems <> "") {
+			$this->rpt_potential_problems = $group_potential_problems;
 		}
-		if ($guideline_level_checked_warnings <> "" || $group_checked_warnings <> "") {
-			$this->rpt_checked_warnings = $guideline_level_checked_warnings . $group_checked_warnings;
+		if ($group_affirmed_problems <> "") {
+			$this->rpt_affirmed_problems = $group_affirmed_problems;
 		}
-		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
-		
+		if ($group_checked_warnings <> "") {
+			$this->rpt_checked_warnings = $group_checked_warnings;
+		}
 		if ($this->show_source == 'true')
 		{
 			$this->generateSourceRpt();
 		}
 	}
 	
-	/*
+	/**
 	 * Re-arrang check error array with check_id as the primary key
 	 * @param: $errors - the error array
 	 * @return: Re-arranged error array
@@ -515,22 +376,19 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 		$known_problems = "";
 		$likely_problems = "";
 		$potential_problems = "";
-		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
 		$affirmed_problems = "";
 		$checked_warnings = "";
 		$no_of_checks_checked_warnings = 0;
 		$no_of_checks_affirmed_problems = 0;
-		$hide_title_potential_problems = false;
-		$hide_title_likely_problems = false;
+		$hide_title_potential_problems = FALSE;
+		$hide_title_likely_problems = FALSE;
 		$no_of_check_errors_potential_problems = 0;
 		$no_of_check_errors_likely_problems = 0;
 		$no_of_check_errors_likely_affirmed_problems = 0;
 		$no_of_check_errors_likely_checked_warnings = 0;
 		$no_of_check_errors_potential_affirmed_problems = 0;
 		$no_of_check_errors_potential_checked_warnings = 0;
-		$is_likely_problem = true;
-		$is_potential_problem = true;
-		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+		
 		
 		foreach ($checks_array as $check) {
 			$html_repair = "";
@@ -551,7 +409,6 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 			if ($repair <> '') {
 				$html_repair = str_replace(array('{REPAIR_LABEL}', '{REPAIR_DETAIL}'), 
 				                           array(_AC("repair"), $repair), $this->html_repair);
-				
 			}
 			
 			if (($row["confidence"] == LIKELY || $row["confidence"] == POTENTIAL) && $this->allow_set_decision == 'true') {
@@ -563,8 +420,8 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 				                                   _AC("fail"), _AC($row['decision_fail'])), 
 				                             $this->html_question);
 			}
-			//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
-			list($html_table_rows_for_one_check,$html_table_rows_for_one_check_checked_warnings,$html_table_rows_for_one_check_affirmed_problems,$no_of_errors_affirmed,$no_of_errors_checked,$no_of_errors_for_one_check) = $this->get_table_rows_for_one_check($this->errors_by_checks[$check_id], $check_id, $row["confidence"]);
+			list($html_table_rows_for_one_check,$html_table_rows_for_one_check_checked_warnings,$html_table_rows_for_one_check_affirmed_problems,$no_of_errors_affirmed,$no_of_errors_checked) = $this->get_table_rows_for_one_check($this->errors_by_checks[$check_id], $check_id, $row["confidence"]);
+			
 			$no_of_errors_for_one_check = count($this->errors_by_checks[$check_id]);
 			if($row["confidence"] == POTENTIAL){
 				$no_of_check_errors_potential_problems = $no_of_check_errors_potential_problems + $no_of_errors_for_one_check;
@@ -576,19 +433,16 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 				$no_of_check_errors_likely_affirmed_problems = $no_of_check_errors_likely_affirmed_problems + $no_of_errors_affirmed;
 				$no_of_check_errors_likely_checked_warnings = $no_of_check_errors_likely_checked_warnings + $no_of_errors_checked;
 			}
-			//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
+			
 			if (($row["confidence"] == LIKELY || $row["confidence"] == POTENTIAL) && $this->allow_set_decision == 'true') {
 				$html_make_decision_button = str_replace(array("{LABEL_MAKE_DECISION}", "{SUBGROUP_ID}"), 
 				                                         array(_AC("make_decision"), $check["subgroupID"]), 
 				                                         $this->html_make_decision_button);
-				
-				//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
 				$html_reverse_decision_button = str_replace(array("{LABEL_MAKE_DECISION}", "{SUBGROUP_ID}"), 
 				                                         array(_AC("reverse_decision"), $check["subgroupID"]), 
 				                                         $this->html_reverse_decision_button);
-				//Added by Anirudh Subramanian for AChecker Manual Evaluations End
-			}
 			
+			}
 			
 			
 			$html_one_problem = str_replace(array("{CHECK_LABEL}",
@@ -610,7 +464,7 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 			                                      $html_table_rows_for_one_check,
 			                                      $html_make_decision_button), 
 			                                $this->html_checks_table);
-			//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+			
 			if($no_of_errors_checked > 0) {
 				
 				if(($no_of_errors_checked + $no_of_errors_affirmed) == $no_of_errors_for_one_check){
@@ -653,7 +507,7 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 									$html_table_rows_for_one_check_checked_warnings,
 									$html_reverse_decision_button), 
 									$this->html_checks_table);
-				$no_of_checks_checked_warnings++;		
+				$no_of_checks_checked_warnings++;					
 			} else {
 				$html_one_problem_checked_warnings = str_replace(array("{CHECK_LABEL}",
 									"{BASE_HREF}", 
@@ -695,8 +549,8 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 			                                      $check["subgroupID"],
 			                                      $html_table_rows_for_one_check,
  			                                      $html_make_decision_button), 
- 			                                $this->html_checks_table_hidden);
-				}
+ 			                                $this->html_checks_table_hidden); 
+ 				}
 				$html_one_problem_affirmed_problems = str_replace(array("{CHECK_LABEL}",
 									"{BASE_HREF}", 
 									"{CHECK_ID}",
@@ -716,7 +570,7 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 									$html_table_rows_for_one_check_affirmed_problems,
 									$html_reverse_decision_button), 
 									$this->html_checks_table);
-				$no_of_checks_affirmed_problems++;				
+				$no_of_checks_affirmed_problems++;					
 			}else{
 				$html_one_problem_affirmed_problems = str_replace(array("{CHECK_LABEL}",
 									"{BASE_HREF}", 
@@ -738,44 +592,33 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 									$html_reverse_decision_button), 
 									$this->html_checks_table_hidden);			
 			}
-			//Added by Anirudh Subramanian for AChecker Manual Evaluations End                                
-			                                
+			
 			if ($row["confidence"] == KNOWN) {
 				$known_problems .= $html_one_problem;
 			} else if ($row["confidence"] == LIKELY) {
 				$likely_problems .= $html_one_problem;
-				//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
 				$affirmed_problems .= $html_one_problem_affirmed_problems;
 				$checked_warnings .= $html_one_problem_checked_warnings;
-				//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+				
 			} else if ($row["confidence"] == POTENTIAL) {
 				$potential_problems .= $html_one_problem;
-				//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
 				$affirmed_problems .= $html_one_problem_affirmed_problems;
 				$checked_warnings .= $html_one_problem_checked_warnings;
-				//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 			}
 		}
-		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
 		if($no_of_check_errors_potential_problems <> 0){
 			if($no_of_check_errors_potential_problems == ($no_of_check_errors_potential_affirmed_problems + $no_of_check_errors_potential_checked_warnings)){
-				$hide_title_potential_problems = true;
+				$hide_title_potential_problems = TRUE;
 			}
-		}/*else{
-			$hide_title_potential_problems = false;
-		}*/
+		}
 		if($no_of_check_errors_likely_problems <> 0){
 			if($no_of_check_errors_likely_problems == ($no_of_check_errors_likely_affirmed_problems + $no_of_check_errors_likely_checked_warnings)){
-				$hide_title_likely_problems = true;
+				$hide_title_likely_problems = TRUE;
 			}
-		}/*else{
-			$hide_title_likely_problems = false;
-		}*/
-		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+		}
 		
-		//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
-		return array($known_problems, $likely_problems, $potential_problems,$affirmed_problems,$checked_warnings,$no_of_checks_affirmed_problems,$no_of_checks_checked_warnings, $hide_title_likely_problems, $hide_title_potential_problems,$is_likely_problem,$is_potential_problem);
-		//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
+		return array($known_problems, $likely_problems, $potential_problems, $affirmed_problems, $checked_warnings,$no_of_checks_affirmed_problems,$no_of_checks_checked_warnings, $hide_title_likely_problems, $hide_title_potential_problems);
+		
 	}
 	
 	/** 
@@ -795,21 +638,19 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 		
 		$th_row = "";
 		$tr_rows = "";
-		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		
 		$th_row_checked_warnings = "";
 		$tr_rows_checked_warnings = "";
 		$th_row_affirmed_problems = "";
 		$tr_rows_affirmed_problems = "";
 		$no_of_errors_checked = 0;
 		$no_of_errors_affirmed = 0;
-		$no_of_errors_for_one_check = 0;
-		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		
 		// generate decision section
 		if ($this->allow_set_decision == 'true' && $confidence <> KNOWN) {
 			$th_row = str_replace(array("{PASS_TEXT}", "{SELECT_ALL_TEXT}", "{CHECK_ID}", "{SELECT_ALL_TEXT}"), 
 			                       array(_AC("pass_header"), _AC("select_all"), $check_id, _AC("select_all")), 
 			                       $this->html_tr_header);
-			//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
 			$th_row_checked_warnings = str_replace(array("{PASS_TEXT}", "{SELECT_ALL_TEXT}", "{CHECK_ID}", "{SELECT_ALL_TEXT}"), 
 								array(_AC("pass_header"), _AC("select_all"), $check_id, _AC("select_all")), 
 								$this->html_tr_header);
@@ -817,12 +658,11 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 			$th_row_affirmed_problems = str_replace(array("{PASS_TEXT}", "{SELECT_ALL_TEXT}", "{CHECK_ID}", "{SELECT_ALL_TEXT}"), 
 								array(_AC("pass_header"), _AC("select_all"), $check_id, _AC("select_all")), 
 								$this->html_tr_header);
-			//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 		}
-		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+		
 		$likely_problems_fail = 0;
 		$potential_problems_fail = 0;
-		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
+		
 		foreach ($errors_for_this_check as $error) {
 			$html_image = "";
 			$msg_type = "";
@@ -830,26 +670,21 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 			$img_src = "";
 			
 			if ($confidence == KNOWN) {
-				if(!isset($this->arr_checks_repeated_known_likely_potential[$check_id])) {
+				//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
+				if(!isset($this->arr_checks_repeated_known_likely_potential[$check_id])){
 					$this->num_of_errors++;
 				}
+				//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
 				$img_type = _AC('error');
 				$img_src = "error.png";
 			} else if ($confidence == LIKELY) {
-				//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
-				if(!isset($this->arr_checks_repeated_known_likely_potential[$check_id])) {
-					$this->num_of_likely_problems++;
-				}
-				//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
+				$this->num_of_likely_problems++;
 				
 				$img_type = _AC('warning');
 				$img_src = "warning.png";
 			} else if ($confidence == POTENTIAL) {
-				//Modified by Anirudh Subramanian for AChecker Manual Evaluations Begin
-				if(!isset($this->arr_checks_repeated_known_likely_potential[$check_id])) {
-					$this->num_of_potential_problems++;
-				}
-				//Modified by Anirudh Subramanian for AChecker Manual Evaluations End
+				$this->num_of_potential_problems++;
+				
 				$img_type = _AC('manual_check');
 				$img_src = "info.png";
 			}
@@ -882,17 +717,12 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 			
 			if (!$row || $row['decision'] == AC_DECISION_FAIL) { // no decision or decision of fail
 				if ($confidence == LIKELY) {
-					
 					$this->num_of_likely_problems_fail++;
-					//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
 					$likely_problems_fail++;
-					//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 				}
 				if ($confidence == POTENTIAL) {
 					$this->num_of_potential_problems_fail++;
-					//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
 					$potential_problems_fail++;
-					//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 				}
 			}
 			
@@ -928,7 +758,6 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 		                         AC_BASE_HREF, 
 		                         $html_image),
 		                   $this->html_problem);
-		    
 		    // compose all <tr> rows
 		    // checkboxes only appear 
 		    // 1. when user is login. In other words, user can make decision.
@@ -938,7 +767,10 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 				$checkbox_html = '<input type="checkbox" class="AC_childCheckBox" id="'.$checkbox_name.'" name="'.$checkbox_name.'" value="1" ';
 				
 				$row_selected = "";
-				
+				if ($row && $row['decision'] == AC_DECISION_PASS){
+					//$checkbox_html .= 'checked="checked" ';
+					//$row_selected = ' class="selected"';
+				}
 				
 				$checkbox_html .= '/>';
 				
@@ -948,36 +780,28 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 				                            array($label_start, $this->label_end), 
 				                            $problem_cell);
 				                            
-				//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+				/*$tr_rows .= str_replace(array("{ROW_SELECTED}", "{CHECKBOX}", "{PROBLEM_DETAIL}"), 
+				                       array($row_selected, $checkbox_html, $problem_cell), $this->html_tr_with_decision);
+				*/                       
 				if ($row && $row['decision'] == AC_DECISION_PASS){
 					$no_of_errors_checked++;
-					$no_of_errors_for_one_check++;
 					$tr_rows_checked_warnings .= str_replace(array("{ROW_SELECTED}", "{CHECKBOX}", "{PROBLEM_DETAIL}"), 
 									array($row_selected, $checkbox_html, $problem_cell), $this->html_tr_with_decision);
 					$tr_rows .= str_replace(array("{ROW_SELECTED}", "{CHECKBOX}", "{PROBLEM_DETAIL}"), 
-				                       array($row_selected, $checkbox_html, $problem_cell), $this->html_tr_with_decision_hidden);
-				        $tr_rows_affirmed_problems .= str_replace(array("{ROW_SELECTED}", "{CHECKBOX}", "{PROBLEM_DETAIL}"), 
-									array($row_selected, $checkbox_html, $problem_cell), $this->html_tr_with_decision_hidden);
-					//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+				                       array($row_selected, $checkbox_html, $problem_cell), $this->html_tr_with_decision_hidden);				
 					if(!isset($this->arr_checks_repeated_checked[$check_id])){
 						$this->num_of_checked_warnings++;	
 				        }
-					//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 				}
 				else if ($row['decision'] == AC_DECISION_FAIL){
 					$no_of_errors_affirmed++;
-					$no_of_errors_for_one_check++;
 					$tr_rows_affirmed_problems .= str_replace(array("{ROW_SELECTED}", "{CHECKBOX}", "{PROBLEM_DETAIL}"), 
 										array($row_selected, $checkbox_html, $problem_cell), $this->html_tr_with_decision);
 					$tr_rows .= str_replace(array("{ROW_SELECTED}", "{CHECKBOX}", "{PROBLEM_DETAIL}"), 
 				                       array($row_selected, $checkbox_html, $problem_cell), $this->html_tr_with_decision_hidden);
-				        $tr_rows_checked_warnings .= str_replace(array("{ROW_SELECTED}", "{CHECKBOX}", "{PROBLEM_DETAIL}"), 
-									array($row_selected, $checkbox_html, $problem_cell), $this->html_tr_with_decision_hidden);               
-					//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
 					if(!isset($this->arr_checks_repeated_affirmed[$check_id])){
 						$this->num_of_affirmed_problems++;
 					}
-					//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 				}else{
 					$tr_rows_checked_warnings .= str_replace(array("{ROW_SELECTED}", "{CHECKBOX}", "{PROBLEM_DETAIL}"), 
 									array($row_selected, $checkbox_html, $problem_cell), $this->html_tr_with_decision_hidden);
@@ -985,17 +809,17 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 									array($row_selected, $checkbox_html, $problem_cell), $this->html_tr_with_decision_hidden);
 					$tr_rows .= str_replace(array("{ROW_SELECTED}", "{CHECKBOX}", "{PROBLEM_DETAIL}"), 
 				                       array($row_selected, $checkbox_html, $problem_cell), $this->html_tr_with_decision);
-				        if(!isset($this->arr_checks_repeated_known_likely_potential[$check_id])){
+					//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
+					if(!isset($this->arr_checks_repeated_known_likely_potential[$check_id])){
 						if ($confidence == LIKELY){
 							$this->num_of_likely_no_decisions++;
 						}
 						if ($confidence == POTENTIAL){
 							$this->num_of_potential_no_decisions++;
 						}	
-				        }               
-				}					
-				//Added by Anirudh Subramanian for AChecker Manual Evaluations End
-				                       
+				        }
+				        //Added by Anirudh Subramanian for AChecker Manual Evaluations End
+				}
 			} else {
 				$problem_cell = str_replace(array("{LABEL_START}", "{LABEL_END}"), 
 				                            array("", ""), 
@@ -1005,6 +829,28 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 				                       array($problem_cell), $this->html_tr_without_decision);
 			}
 		}
+			/*if ($confidence == LIKELY) {
+				if($likely_problems_fail == 0) {
+					$th_row = str_replace(array('input type="checkbox"'), 
+			                       array('input type="checkbox" checked="checked"'), 
+			                       $th_row);
+			                $th_row_checked_warnings = str_replace(array('input type="checkbox"'), 
+								array('input type="checkbox" checked="checked"'), 
+								$th_row_checked_warnings);
+				}
+				
+			}
+			if ($confidence == POTENTIAL) {
+				
+				if($potential_problems_fail == 0){
+					$th_row = str_replace(array('input type="checkbox"'), 
+			                       array('input type="checkbox" checked="checked"'), 
+			                       $th_row);
+			                $th_row_checked_warnings = str_replace(array('input type="checkbox"'), 
+			                       array('input type="checkbox" checked="checked"'), 
+			                       $th_row_checked_warnings);
+				}			
+			}*/
 		//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
 		if(!isset($this->arr_checks_repeated_known_likely_potential[$check_id])){
 			$this->arr_checks_repeated_known_likely_potential[$check_id] = 1;
@@ -1016,7 +862,7 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 			$this->arr_checks_repeated_checked[$check_id] = 1;
 		}
 		//Added by Anirudh Subramanian for AChecker Manual Evaluations End
-		return array($th_row . $tr_rows , $th_row_checked_warnings . $tr_rows_checked_warnings , $th_row_affirmed_problems . $tr_rows_affirmed_problems , $no_of_errors_affirmed , $no_of_errors_checked , $no_of_errors_for_one_check);
+		return array($th_row . $tr_rows , $th_row_checked_warnings . $tr_rows_checked_warnings , $th_row_affirmed_problems . $tr_rows_affirmed_problems , $no_of_errors_affirmed , $no_of_errors_checked);
 	}
 	
 	// generate $this->rpt_source
@@ -1034,24 +880,6 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 		}
 		
 		$this->rpt_source = str_replace("{SOURCE_CONTENT}", $source_content, $this->html_source);
-	}
-	
-	/**
-	* public 
-	* return number of likely errors that for guest user
-	*/
-	public function getNumOfLikelyProblems()
-	{
-		return $this->num_of_likely_problems;
-	}
-	
-	/**
-	* public 
-	* return number of potential errors for guest user
-	*/
-	public function getNumOfPotentialProblems()
-	{
-		return $this->num_of_potential_problems;
 	}
 	
 	//Added by Anirudh Subramanian for AChecker Manual Evaluations Begin
@@ -1090,7 +918,7 @@ class HTMLByGuidelineRpt extends AccessibilityRpt {
 	{
 		return $this->num_of_affirmed_problems;
 	}
-	
+		
 	//Added by Anirudh Subramanian for AChecker Manual Evaluations End
 	
 	/**
